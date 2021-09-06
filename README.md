@@ -15,7 +15,7 @@ Activate
 python setup.pt pytest
 ```
 
-### Build whel
+### Build wheel
 ```
 python setup.py bdist_wheel
 ```
