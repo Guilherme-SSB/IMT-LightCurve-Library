@@ -4,7 +4,7 @@
 IMT-LightCurve
 **************
 
-A friendly Python package for making analysis with CoRoT.
+A Python package for making analysis with CoRoT data.
 
 .. **Version**: |version|
 
