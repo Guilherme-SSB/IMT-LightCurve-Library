@@ -1,0 +1,71 @@
+{
+ "cells": [
+  {
+   "cell_type": "markdown",
+   "source": [
+    "# Quickstart"
+   ],
+   "metadata": {}
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 1,
+   "source": [
+    "!pip install C:\\Users\\guisa\\Desktop\\IMT-LightCurve\\dist\\imt_lightcurve-1.0-py3-none-any.whl"
+   ],
+   "outputs": [
+    {
+     "output_type": "stream",
+     "name": "stdout",
+     "text": [
+      "Processing c:\\users\\guisa\\desktop\\imt-lightcurve\\dist\\imt_lightcurve-1.0-py3-none-any.whl\n",
+      "imt-lightcurve is already installed with the same version as the provided wheel. Use --force-reinstall to force an installation of the wheel.\n"
+     ]
+    }
+   ],
+   "metadata": {}
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "source": [
+    "from imt_lightcurve.models.lightcurve import LightCurve"
+   ],
+   "outputs": [],
+   "metadata": {}
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "source": [
+    "curve = LightCurve([1, 2, 3], [1, 2, 3])"
+   ],
+   "outputs": [],
+   "metadata": {}
+  }
+ ],
+ "metadata": {
+  "orig_nbformat": 4,
+  "language_info": {
+   "name": "python",
+   "version": "3.8.7",
+   "mimetype": "text/x-python",
+   "codemirror_mode": {
+    "name": "ipython",
+    "version": 3
+   },
+   "pygments_lexer": "ipython3",
+   "nbconvert_exporter": "python",
+   "file_extension": ".py"
+  },
+  "kernelspec": {
+   "name": "python3",
+   "display_name": "Python 3.8.7 64-bit ('venv': venv)"
+  },
+  "interpreter": {
+   "hash": "42212eefd821b9529c49b7b394248ba16436095b1cab147b68398feb41c1e4c9"
+  }
+ },
+ "nbformat": 4,
+ "nbformat_minor": 2
+}

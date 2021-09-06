@@ -1,0 +1,2 @@
+nbsphinx
+pydata_sphinx_theme
