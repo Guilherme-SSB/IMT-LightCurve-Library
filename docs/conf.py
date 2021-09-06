@@ -38,8 +38,7 @@ extensions = [
     'sphinx.ext.mathjax',
     'sphinx.ext.intersphinx',
     'sphinx.ext.viewcode',
-    'nbsphinx',
-    'sphinx_book_theme'
+    'nbsphinx'
 ]
 
 highlight_language = 'python3'
