@@ -5,7 +5,7 @@
 ### Virtual env
 
 ```
-cd desktop/utils/env/Scripts
+cd desktop/IMT-LightCurve/venv/Scripts
 Activate
 ```
 
@@ -13,4 +13,9 @@ Activate
 
 ```
 python setup.pt pytest
+```
+
+### Build whel
+```
+python setup.py bdist_wheel
 ```
