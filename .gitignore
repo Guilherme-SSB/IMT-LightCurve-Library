@@ -86,8 +86,8 @@ instance/
 # Scrapy stuff:
 .scrapy
 
-# Sphinx documentation
-docs/_build/
+; # Sphinx documentation
+; docs/_build/
 
 # PyBuilder
 .pybuilder/
@@ -151,5 +151,8 @@ dmypy.json
 
 # Cython debug symbols
 cython_debug/
+
+# Tests 
+tests/
 
 # End of https://www.toptal.com/developers/gitignore/api/python,jupyternotebooks
