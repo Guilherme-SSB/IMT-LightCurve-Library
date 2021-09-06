@@ -15,7 +15,8 @@ import sys
 # sys.path.insert(0, os.path.abspath('.'))
 sys.path.append(os.path.join(os.path.dirname(__name__), '..'))
 
-import sphinx_rtd_theme
+# import sphinx_rtd_theme
+import pydata_sphinx_theme
 
 # -- Project information -----------------------------------------------------
 
