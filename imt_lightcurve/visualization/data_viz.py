@@ -1,10 +1,9 @@
-import re
 from bokeh.plotting import figure, show, output_file
 from bokeh.io import output_notebook
-from bokeh.models import Legend, LegendItem, renderers
+from bokeh.models import Legend, LegendItem
 
-# output_notebook()
-output_file('graph.html')
+output_notebook()
+# output_file('graph.html')
 
 def line_plot(
     x_data=None,
@@ -15,15 +14,22 @@ def line_plot(
     label='Data',
     y_axis_type='auto'):
 
+    delta_x = x_data[1]-x_data[0]
+    delta_y = y_data[1]-y_data[0]
+
+
     p = figure(title=title,
             y_axis_type=y_axis_type,
             plot_width=650, plot_height=400,
-            background_fill_color='#fefefe')
+            background_fill_color='#fefefe',
+            #x_range=(min(x_data)-2*delta_x, max(x_data)+2*delta_x),
+            #y_range=(min(y_data), max(y_data))
+            )
 
     p.xaxis[0].axis_label = x_axis
     p.yaxis[0].axis_label = y_axis
 
-    p.line(x_data, y_data, line_width=2, legend_label=label)
+    p.line(x_data, y_data, color='blue', line_width=2, legend_label=label)
 
     show(p)
 

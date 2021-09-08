@@ -1,5 +1,3 @@
-from datetime import time
-from operator import mul
 from imt_lightcurve.help_functions.filter_helper import *
 from imt_lightcurve.visualization.data_viz import line_plot, multi_line_plot
 
@@ -9,6 +7,7 @@ import numpy as np
 from control import TransferFunction, evalfr
 from scipy.signal import medfilt
 from tabulate import tabulate # Fancy compare results
+import lightkurve as lk
 
 
 # @dataclass
@@ -56,7 +55,7 @@ class LightCurve(BaseLightCurve):
             cutoff_freq: float, 
             order: int, 
             numNei: int, 
-            numExpansion=70):#-> FilteredLightCurve
+            numExpansion=70):# -> FilteredLightCurve:
 
         if filter_technique.upper() == 'IDEAL':
             # Extracting info from curve
@@ -169,8 +168,33 @@ class LightCurve(BaseLightCurve):
     def median_filter(self, numNei, numExpansion=70):
         return self.__apply_filter(self.time, self.flux, filter_technique='median', numNei=numNei, numExpansion=numExpansion, cutoff_freq=None, order=None)
 
+    def fold(self):
+        lightkurve = lk.LightCurve(time=self.time, flux=self.flux)
 
-class FilteredLightCurve(BaseLightCurve):
+        # Grid os peridods to search
+        period = np.linspace(1, 10, 1000)
+
+        # Create a BLS Periodogram
+        bls = lightkurve.to_periodogram('bls', period=period, frequency_factor=500)
+
+        # Extracting info about the BLS Periodogram
+        planet_b_period = bls.period_at_max_power
+        planet_b_t0 = bls.transit_time_at_max_power
+        # print('Period at max power = ', planet_b_period)
+        # print('Transit time at max power =', planet_b_t0)
+
+        # Folded parameters
+        folded_time = lightkurve.flatten().normalize().fold(period=planet_b_period, epoch_time=planet_b_t0).time.value
+
+        folded_flux = lightkurve.flatten().normalize().fold(period=planet_b_period, epoch_time=planet_b_t0).flux.value
+
+        folded_flux_error = lightkurve.flatten().normalize().fold(period=planet_b_period, epoch_time=planet_b_t0).flux_err.value
+
+        return PhaseFoldedLightCurve(time=folded_time, flux=folded_flux, flux_error=folded_flux_error)
+
+
+
+class FilteredLightCurve(LightCurve):
     # Attributes
     filtered_flux: np.ndarray
     filter_technique: str
@@ -207,6 +231,14 @@ class FilteredLightCurve(BaseLightCurve):
 
     def view_fourier_results(self) -> None:
         pass
+
+
+class PhaseFoldedLightCurve(LightCurve):
+    def __init__(self, time: np.ndarray, flux: np.ndarray, flux_error: np.ndarray) -> None:
+        super().__init__(time, flux, flux_error=flux_error)
+
+    def plot(self):
+        super().plot(title='Folded LightCurve', label='Folded Lightcurve')
 
 
 class SimulatedPhaseFoldedLightCurve(BaseLightCurve):
