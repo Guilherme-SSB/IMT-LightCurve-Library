@@ -50,107 +50,113 @@ system('cls')
 # ## Chi2 Error
 # chi2 = simulated_curve.compare_results(see_values=False)
 
+#%%
+###############################
+# 
+# Uncertains()
+# 
+# https://docs.bokeh.org/en/latest/docs/gallery/histogram.html
+# https://stats.stackexchange.com/questions/154133/how-to-get-the-derivative-of-a-normal-distribution-w-r-t-its-parameters
+###############################
+# 
+import pandas as pd
+import numpy as np
+# from scipy.stats import norm
+# import scipy.special
 
-################################
-## 
-## Uncertains()
-##
-################################
-# import pandas as pd
-# import numpy as np
-# # from scipy.stats import norm
-# # import scipy.special
+from bokeh.plotting import figure, show
+from bokeh.io import output_notebook
+output_notebook()
 
-# from bokeh.plotting import figure, show
-# from bokeh.io import output_notebook
-# output_notebook()
+def determine_uncertains(parameter, tolerance):
+    table = pd.read_csv('final_table.csv')
 
-# def determine_uncertains(parameter, tolerance):
-#     table = pd.read_csv('final_table.csv')
+    min_error = table['chi2'].min()
 
-#     min_error = table['chi2'].min()
+    data = []
 
-#     data = []
+    for i in range(len(table['chi2'])):
+        if table['chi2'].loc[i] < min_error+tolerance:
+            data.append(table[parameter].loc[i])
+    return data
 
-#     for i in range(len(table['chi2'])):
-#         if table['chi2'].loc[i] < min_error+tolerance:
-#             data.append(table[parameter].loc[i])
-#     return data
+def stats_for_histogram(data, bins):
+    return np.histogram(data, density=True, bins=bins)
 
-# def stats_for_histogram(data, bins):
-#     return np.histogram(data, density=True, bins=bins)
+def plot_histogram(data=None, bins=30):
 
-# def plot_histogram(data=None, bins=30):
+    hist, edges = stats_for_histogram(data, bins)
 
-#     hist, edges = stats_for_histogram(data, bins)
+    p = figure(title='Histogram plot',
+          plot_width=650, plot_height=400,
+          background_fill_color='#fafafa')
 
-#     p = figure(title='Histogram plot',
-#           plot_width=650, plot_height=400,
-#           background_fill_color='#fafafa')
+    p.quad(top=hist, bottom=0, left=edges[:-1], right=edges[1:],
+            fill_color='navy', line_color='white', alpha=0.5)
 
-#     p.quad(top=hist, bottom=0, left=edges[:-1], right=edges[1:],
-#             fill_color='navy', line_color='white', alpha=0.5)
+    p.y_range.start = 0
 
-#     p.y_range.start = 0
+    show(p)
 
-#     show(p)
+def plot_gaussian(data, mu, sigma):
+    x = np.linspace(min(data), max(data), len(data))
 
-# def plot_gaussian(data, mu, sigma):
-#     x = np.linspace(min(data), max(data), len(data))
+    pdf = 1/(sigma * np.sqrt(2*np.pi)) * np.exp(-(x-mu)**2 / (2*sigma**2))
 
-#     pdf = 1/(sigma * np.sqrt(2*np.pi)) * np.exp(-(x-mu)**2 / (2*sigma**2))
+    p = figure(title='Gaussian distribuition',
+          plot_width=650, plot_height=400,
+          background_fill_color='#fafafa',
+          x_range=(min(data), max(data)))
 
-#     p = figure(title='Gaussian distribuition',
-#           plot_width=650, plot_height=400,
-#           background_fill_color='#fafafa',
-#           x_range=(min(data), max(data)))
+    p.line(x, pdf, line_color='#ff8888', line_width=4, alpha=0.7, legend_label='PDF')
+    p.title.text = f'Normal Distribution Approximation (μ={round(mu,4)}, σ={round(sigma,4)})'
+    p.y_range.start = 0
+    p.legend.location = "center_right"
+    # p.xaxis.axis_label = 'x'
+    # p.yaxis.axis_label = 'Pr(x)'
 
-#     p.line(x, pdf, line_color='#ff8888', line_width=4, alpha=0.7, legend_label='PDF')
-#     p.title.text = f'Normal Distribution Approximation (μ={round(mu,4)}, σ={round(sigma,4)})'
-#     p.y_range.start = 0
-#     p.legend.location = "center_right"
-#     # p.xaxis.axis_label = 'x'
-#     # p.yaxis.axis_label = 'Pr(x)'
+    show(p)
 
-#     show(p)
+def plot_histogram_gaussian(data, bins, mu, sigma, factor=0.005):
+    hist, edges = stats_for_histogram(data, bins)
 
-# def plot_histogram_gaussian(data, bins, mu, sigma, factor=0.005):
-#     hist, edges = stats_for_histogram(data, bins)
+    x = np.linspace(min(data)-factor, max(data)+factor, len(data))
 
-#     x = np.linspace(min(data)-factor, max(data)+factor, len(data))
+    pdf = 1/(sigma * np.sqrt(2*np.pi)) * np.exp(-(x-mu)**2 / (2*sigma**2))
 
-#     pdf = 1/(sigma * np.sqrt(2*np.pi)) * np.exp(-(x-mu)**2 / (2*sigma**2))
+    p = figure(plot_width=650, plot_height=400,
+          background_fill_color='#fafafa',
+          x_range=(min(data)-factor, max(data)+factor) )
 
-#     p = figure(plot_width=650, plot_height=400,
-#           background_fill_color='#fafafa',
-#           x_range=(min(data)-factor, max(data)+factor) )
+    p.quad(top=hist, bottom=0, left=edges[:-1], right=edges[1:],
+            fill_color='navy', line_color='white', alpha=0.5)
 
-#     p.quad(top=hist, bottom=0, left=edges[:-1], right=edges[1:],
-#             fill_color='navy', line_color='white', alpha=0.5)
+    p.line(x, pdf, line_color='#ff8888', line_width=4, alpha=0.7, legend_label='PDF')
 
-#     p.line(x, pdf, line_color='#ff8888', line_width=4, alpha=0.7, legend_label='PDF')
+    p.title.text = f'Normal Distribution Approximation (μ={round(mu,12)}, σ={round(sigma,12)})'
+    p.y_range.start = 0
+    p.legend.location = "center_right"
 
-#     p.title.text = f'Normal Distribution Approximation (μ={round(mu,12)}, σ={round(sigma,12)})'
-#     p.y_range.start = 0
-#     p.legend.location = "center_right"
-
-#     show(p)
+    show(p)
 
 
-# # ['b_impact', 'p', 'period', 'adivR', 'chi2']
+# ['b_impact', 'p', 'period', 'adivR', 'chi2']
+
+data = determine_uncertains('p', 1)
+
+mu = np.mean(data) + 0.004835 
+sigma = 0.0002666
+
+# plot_histogram(data, bins=int(pd.Series(data).nunique())+1)
+# plot_gaussian(data=data, mu=mu, sigma=sigma)
+plot_histogram_gaussian(data=data, bins=30, mu=mu, sigma=sigma, factor=0.005)
+
 
 # data = determine_uncertains('p', 1)
 
-# mu = np.mean(data) + 0.004835 
-# sigma = 0.0002666
-
-# # plot_histogram(data, bins=30)
-# # plot_gaussian(data=data, mu=mu, sigma=sigma)
-# plot_histogram_gaussian(data=data, bins=30, mu=mu, sigma=sigma, factor=0.005)
-
+# hist, edges = np.histogram(data, density=True, bins=int(pd.Series(data).nunique()))
 
 #%%
-
 ################################
 ## 
 ## .fold()
