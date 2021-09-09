@@ -227,7 +227,7 @@ class FilteredLightCurve(LightCurve):
         elif self.filter_technique.upper() == 'BESSEL':
             title = f"{self.filter_technique.capitalize()} filter with Order = {self.order} and Cutoff frequency = {self.cutoff_freq}"
 
-        multi_line_plot(x_data=self.time, y1_data=self.flux, y2_data=self.filtered_flux, label_y1='Original', label_y2='Filtered', title=title, x_axis='Julian Data', y_axis='Flux')
+        multi_line_plot(x_data=self.time, y1_data=self.flux, y2_data=self.filtered_flux, label_y1='Original', label_y2='Filtered', title=title, x_axis='Julian Date', y_axis='Flux')
 
     def view_fourier_results(self) -> None:
         pass
