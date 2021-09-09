@@ -2,7 +2,7 @@ from setuptools import setup
 
 setup(
     name='imt_lightcurve',
-    ython_requires='>=3.7.11',
+    python_requires='>=3.7.11',
     packages=['imt_lightcurve', 'imt_lightcurve.models', 'imt_lightcurve.help_functions', 'imt_lightcurve.simulation', 'imt_lightcurve.visualization'],
     version='1.1',
     description='Library created to manipulate LightCurves',
