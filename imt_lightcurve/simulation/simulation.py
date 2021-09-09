@@ -89,7 +89,7 @@ class Simulate():
 
 
     def simulate_lightcurve(self, observed_curve: LightCurve, b_impact: float=None, p: float=None, period: float=None, adivR: float=None, x_values: np.ndarray=None) -> SimulatedPhaseFoldedLightCurve:
-        print('\nBuilding the light curve...')
+        print('Building the light curve...')
         # If no parameters input was given, the default values are the best ones, computed by the `simulate_values` method
         if b_impact is None:
             print('\nUsing the best b_impact, computed earlier')

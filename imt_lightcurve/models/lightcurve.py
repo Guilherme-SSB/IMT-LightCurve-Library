@@ -263,7 +263,7 @@ class SimulatedPhaseFoldedLightCurve(BaseLightCurve):
     def compare_results(self, see_values=True) -> float:
         if see_values:
             print(tabulate(np.c_[self.flux, self.simulated_flux], headers=['Original flux', 'Simulated flux'], tablefmt='fancy_grid'))
-        print('\nChi squared =', round(self.chi2, 4))
+        # print('Chi squared =', round(self.chi2, 4))
         return self.chi2
 
     
