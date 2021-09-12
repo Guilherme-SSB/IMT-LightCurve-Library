@@ -1,16 +1,18 @@
 from imt_lightcurve.help_functions.filter_helper import *
 from imt_lightcurve.visualization.data_viz import line_plot, multi_line_plot
 
-# from dataclasses import dataclass, field
+import os
 from math import exp, factorial
-import numpy as np
-from control import TransferFunction, evalfr
-from scipy.signal import medfilt
-from tabulate import tabulate # Fancy compare results
 import lightkurve as lk
+import numpy as np
+import pandas as pd
+from control import TransferFunction, evalfr
+
+from scipy.signal import medfilt
+from tabulate import tabulate  # Fancy compare results
+from tqdm.std import tqdm
 
 
-# @dataclass
 class BaseLightCurve():
     # Attributes
     time: np.ndarray
@@ -35,6 +37,7 @@ class BaseLightCurve():
 
     def __repr__(self) -> str:
         return "LightCurve Object"
+
 
 
 class LightCurve(BaseLightCurve):  
@@ -192,6 +195,152 @@ class LightCurve(BaseLightCurve):
 
         return PhaseFoldedLightCurve(time=folded_time, flux=folded_flux, flux_error=folded_flux_error)
 
+    def export_filters_to_csv(
+            self,
+            WHERE_TO_SAVE_PATH:str, 
+            WHERE_ARE_THE_RESAMPLED_DATASET:str, 
+            FILTER_TECHNIQUE:str, 
+            cutoff_freq_range=None, 
+            order_range=None, 
+            numNei_range=None):
+
+        DATASET_PATH = WHERE_ARE_THE_RESAMPLED_DATASET
+
+        total = 33
+
+        if cutoff_freq_range != None:
+            cutoff_freqs = np.arange(start=cutoff_freq_range[0], stop=cutoff_freq_range[1]+cutoff_freq_range[2], step=cutoff_freq_range[2])
+            total *= len(cutoff_freqs)
+        
+        if order_range != None:
+            orders = np.arange(start=order_range[0], stop=order_range[1]+order_range[2], step=order_range[2])
+            total *= len(orders)
+
+        if numNei_range != None:
+            neighboors = np.arange(start=numNei_range[0], stop=numNei_range[1]+numNei_range[2], step=numNei_range[2])
+            total *= len(neighboors)
+
+
+
+        with tqdm(range(total), colour='blue', desc='Saving') as pbar:
+            for root_dir_path, sub_dirs, files in os.walk(DATASET_PATH):
+                for j in range(0, len(files)):
+                    if files[j].endswith('.csv'):
+                        # print(files[j] + ' => Save it!')
+                        data = pd.read_csv(root_dir_path+'/'+files[j])
+                        time = data.DATE.to_numpy()
+                        flux = data.WHITEFLUX.to_numpy()
+                        curve = LightCurve(time, flux)
+
+                        if FILTER_TECHNIQUE.upper() == 'IDEAL':
+                            for cutoff_freq in cutoff_freqs:
+                                filtered = curve.ideal_lowpass_filter(cutoff_freq=cutoff_freq)
+                                flux_filtered = filtered.get_filtered_flux()
+
+                                concat_dict = {
+                                    'DATE': pd.Series(time),
+                                    'WHITEFLUX': pd.Series(flux_filtered)
+                                }
+                                filtered_df = pd.concat(concat_dict, axis=1)
+
+                                folder = WHERE_TO_SAVE_PATH + '/ideal/f0' + str(int(cutoff_freq*10))
+                                if not os.path.exists(folder):
+                                    os.makedirs(folder)
+
+                                file = folder + '/' + FILTER_TECHNIQUE.lower() + '_f0' + str(int(cutoff_freq*10)) + '_' + files[j]
+
+                                # Saving data
+                                filtered_df.to_csv(file, index=False)
+                                pbar.update(1)
+                        
+                        if FILTER_TECHNIQUE.upper() == 'GAUSSIAN':
+                            for cutoff_freq in cutoff_freqs:
+                                filtered = curve.gaussian_lowpass_filter(cutoff_freq=cutoff_freq)
+                                flux_filtered = filtered.get_filtered_flux()
+
+                                concat_dict = {
+                                    'DATE': pd.Series(time),
+                                    'WHITEFLUX': pd.Series(flux_filtered)
+                                }
+                                filtered_df = pd.concat(concat_dict, axis=1)
+
+                                folder = WHERE_TO_SAVE_PATH + '/gaussian/f0' + str(int(cutoff_freq*10))
+                                if not os.path.exists(folder):
+                                    os.makedirs(folder)
+
+                                file = folder + '/' + FILTER_TECHNIQUE.lower() + '_f0' + str(int(cutoff_freq*10)) + '_' + files[j]
+
+                                # Saving data
+                                filtered_df.to_csv(file, index=False)
+                                pbar.update(1)
+                    
+                        if FILTER_TECHNIQUE.upper() == 'BUTTERWORTH':
+                            for cutoff_freq in cutoff_freqs:
+                                for order in orders:
+                                    filtered = curve.butterworth_lowpass_filter(order=order, cutoff_freq=cutoff_freq)
+                                    flux_filtered = filtered.get_filtered_flux()
+
+                                    concat_dict = {
+                                        'DATE': pd.Series(time),
+                                        'WHITEFLUX': pd.Series(flux_filtered)
+                                    }
+                                    filtered_df = pd.concat(concat_dict, axis=1)
+
+                                    folder = WHERE_TO_SAVE_PATH + '/butterworth/n' + str(int(order)) + '/f0' + str(int(cutoff_freq*10))
+                                    if not os.path.exists(folder):
+                                        os.makedirs(folder)
+
+                                    file = folder + '/' + FILTER_TECHNIQUE.lower() + '_n' + str(int(order)) + '_f0' + str(int(cutoff_freq*10)) + '_' + files[j]
+
+                                    # Saving data
+                                    filtered_df.to_csv(file, index=False)
+                                    pbar.update(1)
+                            
+                        if FILTER_TECHNIQUE.upper() == 'BESSEL':
+                            for cutoff_freq in cutoff_freqs:
+                                for order in orders:
+                                    filtered = curve.bessel_lowpass_filter(order=order, cutoff_freq=cutoff_freq, numExpansion=100)
+                                    flux_filtered = filtered.get_filtered_flux()
+
+                                    concat_dict = {
+                                        'DATE': pd.Series(time),
+                                        'WHITEFLUX': pd.Series(flux_filtered)
+                                    }
+                                    filtered_df = pd.concat(concat_dict, axis=1)
+
+                                    folder = WHERE_TO_SAVE_PATH + '/bessel/n' + str(int(order)) + '/f0' + str(int(cutoff_freq*10))
+                                    if not os.path.exists(folder):
+                                        os.makedirs(folder)
+
+                                    file = folder + '/' + FILTER_TECHNIQUE.lower() + '_n' + str(int(order)) + '_f0' + str(int(cutoff_freq*10)) + '_' + files[j]
+
+                                    # Saving data
+                                    filtered_df.to_csv(file, index=False)
+                                    pbar.update(1)
+                            
+                        if FILTER_TECHNIQUE.upper() == 'MEDIAN':
+                            for numNei in neighboors:
+                                filtered_curve = curve.median_filter(numNei=numNei)
+                                flux_filtered = filtered_curve.get_filtered_flux()
+
+                                concat_dict = {
+                                        'DATE': pd.Series(time),
+                                        'WHITEFLUX': pd.Series(flux_filtered)
+                                    }
+                                filtered_df = pd.concat(concat_dict, axis=1)
+
+                                folder = WHERE_TO_SAVE_PATH + '/median/numNei' + str(int(numNei))
+                                if not os.path.exists(folder):
+                                    os.makedirs(folder)
+                    
+                                file = folder + '/' + FILTER_TECHNIQUE.lower() + '_num' + str(int(numNei)) + '_' + files[j]
+
+                                # Saving data
+                                filtered_df.to_csv(file, index=False)
+                                pbar.update(1)
+
+        print(f'\nData from {FILTER_TECHNIQUE} has been saved successfully!')
+    
 
 
 class FilteredLightCurve(LightCurve):
@@ -232,6 +381,10 @@ class FilteredLightCurve(LightCurve):
     def view_fourier_results(self) -> None:
         pass
 
+    def get_filtered_flux(self) -> np.ndarray:
+        return self.filtered_flux
+    
+
 
 class PhaseFoldedLightCurve(LightCurve):
     def __init__(self, time: np.ndarray, flux: np.ndarray, flux_error: np.ndarray) -> None:
@@ -239,6 +392,7 @@ class PhaseFoldedLightCurve(LightCurve):
 
     def plot(self):
         super().plot(title='Folded LightCurve', label='Folded Lightcurve')
+
 
 
 class SimulatedPhaseFoldedLightCurve(BaseLightCurve):
