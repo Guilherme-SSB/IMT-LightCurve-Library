@@ -12,7 +12,7 @@ Activate
 ### Run tests
 
 ```
-python setup.pt pytest
+python setup.py pytest
 ```
 
 ### Build wheel
