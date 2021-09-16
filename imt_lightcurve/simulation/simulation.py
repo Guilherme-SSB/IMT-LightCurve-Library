@@ -78,12 +78,12 @@ class Simulate():
         if results_to_csv:
             sorted_table.to_csv('final_table.csv', index=False)
 
-        print("\nBest parameters are:")
-        print('-> Best b_impact =', self.b_impact_best)
-        print('-> Best p =', self.p_best)
-        print('-> Best period =', self.period_best)
-        print('-> Best adivR =', self.adivR_best)
-        print('-> Best chi2 =', self.chi2_best, end='\n\n')
+        print("\nBest parameters computed are:")
+        print('-> b_impact =', self.b_impact_best, '±', round(self.__calculate_uncertains('b_impact', 0.05), 8))
+        print('-> p =', self.p_best, '±',round(self.__calculate_uncertains('p', 0.05), 8))
+        print('-> period =', self.period_best, '±', round(self.__calculate_uncertains('period', 0.05), 8))
+        print('-> adivR =', self.adivR_best, '±', round(self.__calculate_uncertains('adivR', 0.05), 8))
+        print('-> chi2 =', self.chi2_best, end='\n\n')
 
         return sorted_table
 
@@ -299,4 +299,22 @@ class Simulate():
         chi2 = 0
         chi2 = sum(((observed_curve.flux - simulated_curve.simulated_flux)**2)/(observed_curve.flux_error**2) )
         return chi2
+
+
+    def __calculate_uncertains(self, parameter: str, tolarance: float) -> float:
+        parameter_values = self.simulation_table[parameter]
+        min_error = self.simulation_table['chi2'].min()
+        data = []
+        for i in range(len(self.simulation_table['chi2'])):
+            if (self.simulation_table['chi2'].loc[i] < (min_error + tolarance)):
+                data.append(parameter_values.loc[i])
+        data = np.array(data)
+
+        # x_bar = np.mean(data)
+        sigma = np.std(data)
+        n = len(data)
+        z = 1.96 # -> 95% 
+
+        return (z*sigma)/sqrt(n)
+
 
