@@ -10,11 +10,11 @@ output_notebook()
 final_table = pd.read_csv('final_table.csv')
 
 ### Selecting the parameter
-parameter = 'p'
+parameter = 'b_impact'
 parameter_table = final_table[parameter]
 
 ### Determinating the tolerance
-tolerance = 0.1
+tolerance = 0.05
 
 min_error = final_table['chi2'].min()
 data = []
@@ -22,6 +22,8 @@ for i in range(len(final_table['chi2'])):
     if final_table['chi2'].loc[i] < min_error + tolerance:
         data.append(parameter_table.loc[i])
 
+print(final_table)
+print(pd.Series(data).value_counts())
 
 ### Defining some help funcions
 
@@ -63,14 +65,26 @@ def plot_gaussian(data, amplitude, mu, sigma, bins, factor=0.005):
     show(p)
 
 
+#%%
+from math import sqrt
+
+x_bar = np.mean(data)
+sigma = np.std(data)
+n = len(data)
+z = 1.96
+
+
+print('Confidence Interval =', round(x_bar, 4), '±', round((z*sigma)/sqrt(n),8) )
+
+
 # %%
-from scipy.stats import norm 
+# from scipy.stats import norm 
 
-### Computing mu and sigma
-mu, sigma = norm.fit(data)
+# ### Computing mu and sigma
+# mu, sigma = norm.fit(data)
 
-# plot_histogram(data, bins=int(pd.Series(data).nunique())+1)
-plot_gaussian(data, amplitude=1, mu=mu, sigma=sigma, bins=int(pd.Series(data).nunique())+1)
+# # plot_histogram(data, bins=int(pd.Series(data).nunique())+1)
+# plot_gaussian(data, amplitude=1, mu=mu, sigma=sigma, bins=int(pd.Series(data).nunique())+1)
 
 
 
