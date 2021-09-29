@@ -13,6 +13,9 @@ def line_plot(
         x_axis='x-axis',
         y_axis='y-axis',
         label='Data',
+        x_range=None,
+        y_range=None,
+        x_axis_type='auto',
         y_axis_type='auto', 
         reverse=False):
 
@@ -21,20 +24,20 @@ def line_plot(
 
 
     p = figure(title=title,
+               x_axis_type=x_axis_type,
                y_axis_type=y_axis_type,
                plot_width=650, plot_height=400,
-               background_fill_color='#fefefe',
-               #x_range=(min(x_data)-2*delta_x, max(x_data)+2*delta_x),
-               #y_range=(min(y_data), max(y_data))
-               )
+               x_range=x_range,
+               y_range=y_range,
+               background_fill_color='#fefefe')
+
     if reverse:
             p = figure(title=title,
                y_axis_type=y_axis_type,
                plot_width=650, plot_height=400,
                background_fill_color='#fefefe',
                x_range=(min(x_data), max(x_data)),
-               y_range=(max(y_data), min(y_data))
-               )
+               y_range=(max(y_data), min(y_data)))
 
     p.xaxis[0].axis_label = x_axis
     p.yaxis[0].axis_label = y_axis
@@ -53,11 +56,17 @@ def multi_line_plot(
         title='Multi-Line Plot',
         x_axis='x-axis',
         y_axis='y-axis',
+        x_range=None,
+        y_range=None,
+        x_axis_type='auto',
         y_axis_type='auto'):
 
     p = figure(title=title,
+               x_axis_type=x_axis_type,
                y_axis_type=y_axis_type,
                plot_width=650, plot_height=400,
+               x_range=x_range,
+               y_range=y_range,
                background_fill_color='#fefefe')
 
     p.xaxis[0].axis_label = x_axis
