@@ -147,3 +147,4 @@ def calculate_flux(c2, c4, Omega, lambda_e, lambda_d, eta_d, p, w, z) -> float:
 
     if (p > z[w]):
         return 1-(4*Omega)**(-1)*((1-c2)*lambda_e+c2*(lambda_d+(2/3)-c4*eta_d))
+
