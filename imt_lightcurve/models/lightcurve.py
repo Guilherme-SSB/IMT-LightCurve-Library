@@ -47,6 +47,7 @@ class BaseLightCurve():
         return "LightCurve Object"
 
 
+
 class LightCurve(BaseLightCurve):  
 
     def plot(self, title='Lightcurve', x_axis='Julian Data', y_axis='Flux', label='Lightcurve') -> None:
@@ -162,7 +163,7 @@ class LightCurve(BaseLightCurve):
             array_filtered += (np.mean(flux) - np.mean(array_filtered))
 
         return FilteredLightCurve(time=time, flux=flux, flux_error=None, filtered_flux=array_filtered, filter_technique=filter_technique, cutoff_freq=cutoff_freq, order=order, numNei=numNei)
-        
+
     def ideal_lowpass_filter(self, cutoff_freq, numExpansion: int=70):
         return self.__apply_filter(self.time, self.flux, filter_technique='ideal', cutoff_freq=cutoff_freq, numExpansion=numExpansion, order=None, numNei=None)
 
@@ -178,7 +179,7 @@ class LightCurve(BaseLightCurve):
     def median_filter(self, numNei, numExpansion: int=70):
         return self.__apply_filter(self.time, self.flux, filter_technique='median', numNei=numNei, numExpansion=numExpansion, cutoff_freq=None, order=None)
 
-    def fold(self, window: float=0.15, window_filter: int=201, order_filter: int=3):
+    def fold(self, smooth_curve: bool=False, window: float=0.15, window_filter: int=201, order_filter: int=3):
         lightkurve = lk.LightCurve(time=self.time, flux=self.flux)
 
         # Grid os peridods to search
@@ -200,15 +201,26 @@ class LightCurve(BaseLightCurve):
         time_w = folded_time[(folded_time > -1*window) & (folded_time < window)]
         flux_w = folded_flux[(folded_time > -1*window) & (folded_time < window)]
 
-        # Smoothing curve
-        smoothed_flux = self.__savitzky_golay(flux_w, window_size=window_filter, order=order_filter)
+        if smooth_curve:
+            # Smoothing curve
+            smoothed_flux = self.__savitzky_golay(flux_w, window_size=window_filter, order=order_filter)
+
+            # Uncertainties
+            folded_flux_error = np.std(smoothed_flux)
+            folded_flux_error_array = [folded_flux_error for i in range(len(time_w))]
+
+            # Return
+            returnCurve = PhaseFoldedLightCurve(time=time_w, flux=smoothed_flux)
+            returnCurve.flux_error = folded_flux_error_array
+            return returnCurve
 
         # Uncertainties
-        folded_flux_error = np.std(smoothed_flux)
+        folded_flux_error = np.std(flux_w)
         folded_flux_error_array = [folded_flux_error for i in range(len(time_w))]
 
         # Return
-        returnCurve = PhaseFoldedLightCurve(time=time_w, flux=smoothed_flux)
+        returnCurve = PhaseFoldedLightCurve(time=time_w, flux=flux_w)
+        # returnCurve = PhaseFoldedLightCurve(time=folded_time, flux=folded_flux)
         returnCurve.flux_error = folded_flux_error_array
         return returnCurve
 
@@ -357,7 +369,7 @@ class LightCurve(BaseLightCurve):
                                 pbar.update(1)
 
         print(f'\nData from {FILTER_TECHNIQUE} has been saved successfully!')
-    
+
     def __savitzky_golay(self, y, window_size, order, deriv=0, rate=1):
         r"""Smooth (and optionally differentiate) data with a Savitzky-Golay filter.
         The Savitzky-Golay filter removes high frequency noise from data.
@@ -437,7 +449,6 @@ class LightCurve(BaseLightCurve):
     def __replace_zero_values(array: np.ndarray) -> np.ndarray:
         return np.where(array==0, array[-1], array)
 
-
     @abstractmethod
     def get_true_value(corot_id: int, parameter: str) -> float:
         """The keywords to be passed as `parameter: str` are:
@@ -493,7 +504,7 @@ class LightCurve(BaseLightCurve):
         b_values = sorted(b_values)
         return np.array(b_values)
 
-    
+   
 
 class FilteredLightCurve(LightCurve):
     # Attributes
@@ -535,7 +546,7 @@ class FilteredLightCurve(LightCurve):
 
     def get_filtered_flux(self) -> np.ndarray:
         return self.filtered_flux
-    
+
 
 
 class PhaseFoldedLightCurve(LightCurve):
@@ -559,7 +570,6 @@ class SimulatedPhaseFoldedLightCurve(BaseLightCurve):
         self.simulated_flux = simulated_flux
         self.chi2 = chi2
 
-
     def __repr__(self) -> str:
         return super().__repr__()
 
@@ -575,8 +585,3 @@ class SimulatedPhaseFoldedLightCurve(BaseLightCurve):
 
     
 
-
-
-
-    
-    
