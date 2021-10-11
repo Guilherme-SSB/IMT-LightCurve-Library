@@ -1,6 +1,6 @@
 from bokeh.plotting import figure, show, output_file
 from bokeh.io import output_notebook
-from bokeh.models import Legend, LegendItem
+from bokeh.models import Legend, LegendItem, LassoSelectTool, HoverTool
 
 output_notebook()
 # output_file('graph.html')
@@ -43,6 +43,8 @@ def line_plot(
     p.yaxis[0].axis_label = y_axis
 
     p.line(x_data, y_data, color='blue', line_width=2, legend_label=label)
+    p.add_tools(LassoSelectTool())
+    p.add_tools(HoverTool())
 
     show(p)
 
@@ -83,5 +85,7 @@ def multi_line_plot(
     ])
 
     p.add_layout(legend)
+    p.add_tools(LassoSelectTool())
+    p.add_tools(HoverTool())
 
     show(p)
