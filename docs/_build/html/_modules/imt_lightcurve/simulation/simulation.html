@@ -1,0 +1,469 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>imt_lightcurve.simulation.simulation &#8212; IMT-LightCurve Library 1.0 documentation</title>
+    
+  <link href="../../../_static/css/theme.css" rel="stylesheet" />
+  <link href="../../../_static/css/index.c5995385ac14fb8791e8eb36b4908be2.css" rel="stylesheet" />
+
+    
+  <link rel="stylesheet"
+    href="../../../_static/vendor/fontawesome/5.13.0/css/all.min.css">
+  <link rel="preload" as="font" type="font/woff2" crossorigin
+    href="../../../_static/vendor/fontawesome/5.13.0/webfonts/fa-solid-900.woff2">
+  <link rel="preload" as="font" type="font/woff2" crossorigin
+    href="../../../_static/vendor/fontawesome/5.13.0/webfonts/fa-brands-400.woff2">
+
+    
+      
+
+    
+    <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/basic.css" />
+    
+  <link rel="preload" as="script" href="../../../_static/js/index.1c5a1a01449ed65a7b51.js">
+
+    <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
+    <script src="../../../_static/jquery.js"></script>
+    <script src="../../../_static/underscore.js"></script>
+    <script src="../../../_static/doctools.js"></script>
+    <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="docsearch:language" content="en" />
+    
+  </head>
+  <body data-spy="scroll" data-target="#bd-toc-nav" data-offset="80">
+    
+    <div class="container-fluid" id="banner"></div>
+
+    
+    <nav class="navbar navbar-light navbar-expand-lg bg-light fixed-top bd-navbar" id="navbar-main"><div class="container-xl">
+
+  <div id="navbar-start">
+    
+    
+<a class="navbar-brand" href="../../../index.html">
+<p class="title">IMT-LightCurve Library</p>
+</a>
+
+    
+  </div>
+
+  <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbar-collapsible" aria-controls="navbar-collapsible" aria-expanded="false" aria-label="Toggle navigation">
+    <span class="navbar-toggler-icon"></span>
+  </button>
+
+  
+  <div id="navbar-collapsible" class="col-lg-9 collapse navbar-collapse">
+    <div id="navbar-center" class="mr-auto">
+      
+      <div class="navbar-center-item">
+        <ul id="navbar-main-elements" class="navbar-nav">
+    <li class="toctree-l1 nav-item">
+ <a class="reference internal nav-link" href="../../../quickstart.html">
+  Quickstart
+ </a>
+</li>
+
+<li class="toctree-l1 nav-item">
+ <a class="reference internal nav-link" href="../../../modules.html">
+  IMT-LightCurve
+ </a>
+</li>
+
+    
+</ul>
+      </div>
+      
+    </div>
+
+    <div id="navbar-end">
+      
+      <div class="navbar-end-item">
+        <ul id="navbar-icon-links" class="navbar-nav" aria-label="Icon Links">
+      </ul>
+      </div>
+      
+    </div>
+  </div>
+</div>
+    </nav>
+    
+
+    <div class="container-xl">
+      <div class="row">
+          
+            
+            <!-- Only show if we have sidebars configured, else just a small margin  -->
+            <div class="col-12 col-md-3 bd-sidebar"><form class="bd-search d-flex align-items-center" action="../../../search.html" method="get">
+  <i class="icon fas fa-search"></i>
+  <input type="search" class="form-control" name="q" id="search-input" placeholder="Search the docs ..." aria-label="Search the docs ..." autocomplete="off" >
+</form><nav class="bd-links" id="bd-docs-nav" aria-label="Main navigation">
+  <div class="bd-toc-item active">
+    
+  </div>
+</nav>
+            </div>
+            
+          
+
+          
+          <div class="d-none d-xl-block col-xl-2 bd-toc">
+            
+          </div>
+          
+
+          
+          
+            
+          
+          <main class="col-12 col-md-9 col-xl-7 py-md-5 pl-md-5 pr-md-4 bd-content" role="main">
+              
+              <div>
+                
+  <h1>Source code for imt_lightcurve.simulation.simulation</h1><div class="highlight"><pre>
+<span></span><span class="kn">from</span> <span class="nn">imt_lightcurve.help_functions.simulation_helper</span> <span class="kn">import</span> <span class="o">*</span>
+<span class="kn">from</span> <span class="nn">imt_lightcurve.models.lightcurve</span> <span class="kn">import</span> <span class="p">(</span><span class="n">LightCurve</span><span class="p">,</span> <span class="n">SimulatedPhaseFoldedLightCurve</span><span class="p">)</span>
+
+<span class="kn">from</span> <span class="nn">dataclasses</span> <span class="kn">import</span> <span class="n">dataclass</span><span class="p">,</span> <span class="n">field</span>
+
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="kn">import</span> <span class="nn">scipy.signal</span> <span class="k">as</span> <span class="nn">scs</span>
+<span class="kn">from</span> <span class="nn">tqdm</span> <span class="kn">import</span> <span class="n">tqdm</span>
+
+
+<div class="viewcode-block" id="Simulate"><a class="viewcode-back" href="../../../imt-lightcurve.html#imt_lightcurve.simulation.simulation.Simulate">[docs]</a><span class="nd">@dataclass</span><span class="p">(</span><span class="n">frozen</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="k">class</span> <span class="nc">Simulate</span><span class="p">():</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Class that applies the modeling created by Mandel &amp; Agol (2008).</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># Constants</span>
+    <span class="c1">## Coefficientes of limb darkening</span>
+    <span class="n">gamma1</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="mf">0.44</span><span class="p">)</span>
+    <span class="n">gamma2</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="mf">0.23</span><span class="p">)</span>
+
+    <span class="c1">## Sampling intervals of parameter&#39;s values</span>
+    <span class="n">delta_b</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="mf">0.01</span><span class="p">,</span> <span class="nb">repr</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+    <span class="n">delta_adivR</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span> <span class="nb">repr</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+    <span class="n">delta_period</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="mf">0.01</span><span class="p">,</span> <span class="nb">repr</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+    <span class="n">delta_p</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="mf">0.01</span><span class="p">,</span> <span class="nb">repr</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+
+    <span class="c1">## Best fitting parameters</span>
+    <span class="n">b_impact_best</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="nb">repr</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+    <span class="n">p_best</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="nb">repr</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+    <span class="n">period_best</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="nb">repr</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+    <span class="n">adivR_best</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="nb">repr</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+    <span class="n">chi2_best</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="nb">repr</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+
+    <span class="c1">## Final table, computes after the `simulate_values` method run</span>
+    <span class="n">simulation_table</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;b_impact&#39;</span><span class="p">,</span> <span class="s1">&#39;p&#39;</span><span class="p">,</span> <span class="s1">&#39;period&#39;</span><span class="p">,</span> <span class="s1">&#39;adivR&#39;</span><span class="p">,</span> <span class="s1">&#39;chi2&#39;</span><span class="p">]),</span> <span class="nb">repr</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+
+    <span class="c1"># Class methods</span>
+<div class="viewcode-block" id="Simulate.simulate_values"><a class="viewcode-back" href="../../../imt-lightcurve.html#imt_lightcurve.simulation.simulation.Simulate.simulate_values">[docs]</a>    <span class="k">def</span> <span class="nf">simulate_values</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">observed_curve</span><span class="p">:</span> <span class="n">LightCurve</span><span class="p">,</span> <span class="n">b_values</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">p_values</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">period_values</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">adivR_values</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">x_values</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">set_best_values</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">results_to_csv</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Starting simulation...&#39;</span><span class="p">)</span>
+        <span class="n">list_b_values</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">list_p_values</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">list_period_values</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">list_adivR_values</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">list_chi2_values</span> <span class="o">=</span> <span class="p">[]</span>
+
+        <span class="n">total</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">b_values</span><span class="p">)</span> <span class="o">*</span> <span class="nb">len</span><span class="p">(</span><span class="n">p_values</span><span class="p">)</span> <span class="o">*</span> <span class="nb">len</span><span class="p">(</span><span class="n">period_values</span><span class="p">)</span> <span class="o">*</span> <span class="nb">len</span><span class="p">(</span><span class="n">adivR_values</span><span class="p">)</span>
+        <span class="k">with</span> <span class="n">tqdm</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="n">total</span><span class="p">),</span> <span class="n">colour</span><span class="o">=</span><span class="s1">&#39;blue&#39;</span><span class="p">,</span> <span class="n">desc</span><span class="o">=</span><span class="s1">&#39;Simulating&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">pbar</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">b_impact</span> <span class="ow">in</span> <span class="n">b_values</span><span class="p">:</span>
+                <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">p_values</span><span class="p">:</span>
+                    <span class="k">for</span> <span class="n">period</span> <span class="ow">in</span> <span class="n">period_values</span><span class="p">:</span>
+                        <span class="k">for</span> <span class="n">adivR</span> <span class="ow">in</span> <span class="n">adivR_values</span><span class="p">:</span>
+                            <span class="n">simulated_curve</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__simulate</span><span class="p">(</span><span class="n">observed_curve</span><span class="o">=</span><span class="n">observed_curve</span><span class="p">,</span> <span class="n">b_impact</span><span class="o">=</span><span class="n">b_impact</span><span class="p">,</span> <span class="n">p</span><span class="o">=</span><span class="n">p</span><span class="p">,</span> <span class="n">period</span><span class="o">=</span><span class="n">period</span><span class="p">,</span> <span class="n">adivR</span><span class="o">=</span><span class="n">adivR</span><span class="p">,</span> <span class="n">x_values</span><span class="o">=</span><span class="n">x_values</span><span class="p">)</span>
+                            <span class="n">chi2</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__calculate_chi2</span><span class="p">(</span><span class="n">observed_curve</span><span class="o">=</span><span class="n">observed_curve</span><span class="p">,</span> <span class="n">simulated_curve</span><span class="o">=</span><span class="n">simulated_curve</span><span class="p">)</span>
+
+                            <span class="n">list_b_values</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">b_impact</span><span class="p">)</span>
+                            <span class="n">list_p_values</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">p</span><span class="p">)</span>
+                            <span class="n">list_period_values</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">period</span><span class="p">)</span>
+                            <span class="n">list_adivR_values</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">adivR</span><span class="p">)</span>
+                            <span class="n">list_chi2_values</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">chi2</span><span class="p">)</span>
+                            <span class="n">pbar</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+
+        
+        <span class="bp">self</span><span class="o">.</span><span class="n">simulation_table</span><span class="p">[</span><span class="s1">&#39;b_impact&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">list_b_values</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">simulation_table</span><span class="p">[</span><span class="s1">&#39;p&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">list_p_values</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">simulation_table</span><span class="p">[</span><span class="s1">&#39;period&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">list_period_values</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">simulation_table</span><span class="p">[</span><span class="s1">&#39;adivR&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">list_adivR_values</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">simulation_table</span><span class="p">[</span><span class="s1">&#39;chi2&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">list_chi2_values</span>
+
+    
+        <span class="n">sorted_table</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">simulation_table</span><span class="o">.</span><span class="n">sort_values</span><span class="p">(</span><span class="n">by</span><span class="o">=</span><span class="s1">&#39;chi2&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">set_best_values</span><span class="p">:</span>
+            <span class="nb">object</span><span class="o">.</span><span class="fm">__setattr__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s1">&#39;b_impact_best&#39;</span><span class="p">,</span> <span class="n">sorted_table</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">sorted_table</span><span class="o">.</span><span class="n">index</span><span class="p">[</span><span class="mi">0</span><span class="p">]][</span><span class="mi">0</span><span class="p">])</span>
+            <span class="nb">object</span><span class="o">.</span><span class="fm">__setattr__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s1">&#39;p_best&#39;</span><span class="p">,</span> <span class="n">sorted_table</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">sorted_table</span><span class="o">.</span><span class="n">index</span><span class="p">[</span><span class="mi">0</span><span class="p">]][</span><span class="mi">1</span><span class="p">])</span>
+            <span class="nb">object</span><span class="o">.</span><span class="fm">__setattr__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s1">&#39;period_best&#39;</span><span class="p">,</span> <span class="n">sorted_table</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">sorted_table</span><span class="o">.</span><span class="n">index</span><span class="p">[</span><span class="mi">0</span><span class="p">]][</span><span class="mi">2</span><span class="p">])</span>
+            <span class="nb">object</span><span class="o">.</span><span class="fm">__setattr__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s1">&#39;adivR_best&#39;</span><span class="p">,</span> <span class="n">sorted_table</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">sorted_table</span><span class="o">.</span><span class="n">index</span><span class="p">[</span><span class="mi">0</span><span class="p">]][</span><span class="mi">3</span><span class="p">])</span>
+            <span class="nb">object</span><span class="o">.</span><span class="fm">__setattr__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s1">&#39;chi2_best&#39;</span><span class="p">,</span> <span class="n">sorted_table</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">sorted_table</span><span class="o">.</span><span class="n">index</span><span class="p">[</span><span class="mi">0</span><span class="p">]][</span><span class="mi">4</span><span class="p">])</span>
+        <span class="k">if</span> <span class="n">results_to_csv</span><span class="p">:</span>
+            <span class="n">sorted_table</span><span class="o">.</span><span class="n">to_csv</span><span class="p">(</span><span class="s1">&#39;final_table.csv&#39;</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">Best parameters are:&quot;</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;-&gt; Best b_impact =&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">b_impact_best</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;-&gt; Best p =&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">p_best</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;-&gt; Best period =&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">period_best</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;-&gt; Best adivR =&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">adivR_best</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;-&gt; Best chi2 =&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">chi2_best</span><span class="p">,</span> <span class="n">end</span><span class="o">=</span><span class="s1">&#39;</span><span class="se">\n\n</span><span class="s1">&#39;</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">sorted_table</span></div>
+
+
+<div class="viewcode-block" id="Simulate.simulate_lightcurve"><a class="viewcode-back" href="../../../imt-lightcurve.html#imt_lightcurve.simulation.simulation.Simulate.simulate_lightcurve">[docs]</a>    <span class="k">def</span> <span class="nf">simulate_lightcurve</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">observed_curve</span><span class="p">:</span> <span class="n">LightCurve</span><span class="p">,</span> <span class="n">b_impact</span><span class="p">:</span> <span class="nb">float</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">p</span><span class="p">:</span> <span class="nb">float</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">period</span><span class="p">:</span> <span class="nb">float</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">adivR</span><span class="p">:</span> <span class="nb">float</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">x_values</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">SimulatedPhaseFoldedLightCurve</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">Building the light curve...&#39;</span><span class="p">)</span>
+        <span class="c1"># If no parameters input was given, the default values are the best ones, computed by the `simulate_values` method</span>
+        <span class="k">if</span> <span class="n">b_impact</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">Using the best b_impact, computed earlier&#39;</span><span class="p">)</span>
+            <span class="n">b_impact</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">b_impact_best</span>
+
+        <span class="k">if</span> <span class="n">p</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Using the best p, computed earlier&#39;</span><span class="p">)</span>
+            <span class="n">p</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">p_best</span>
+
+        <span class="k">if</span> <span class="n">period</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Using the best period, computed earlier&#39;</span><span class="p">)</span>
+            <span class="n">period</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">period_best</span>
+
+        <span class="k">if</span> <span class="n">adivR</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Using the best adivR, computed earlier</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+            <span class="n">adivR</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">adivR_best</span>
+
+        <span class="c1"># Simulate value</span>
+        <span class="n">simulated_curve</span> <span class="o">=</span>  <span class="bp">self</span><span class="o">.</span><span class="n">__simulate</span><span class="p">(</span><span class="n">observed_curve</span><span class="p">,</span> <span class="n">b_impact</span><span class="p">,</span> <span class="n">p</span><span class="p">,</span> <span class="n">period</span><span class="p">,</span> <span class="n">adivR</span><span class="p">,</span> <span class="n">x_values</span><span class="p">)</span>
+        <span class="n">chi2</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__calculate_chi2</span><span class="p">(</span><span class="n">observed_curve</span><span class="p">,</span> <span class="n">simulated_curve</span><span class="p">)</span>
+
+        <span class="c1"># Return </span>
+        <span class="n">time</span> <span class="o">=</span> <span class="n">observed_curve</span><span class="o">.</span><span class="n">time</span>
+        <span class="n">flux</span> <span class="o">=</span> <span class="n">observed_curve</span><span class="o">.</span><span class="n">flux</span>
+        <span class="n">flux_error</span> <span class="o">=</span> <span class="n">observed_curve</span><span class="o">.</span><span class="n">flux_error</span>
+        <span class="n">simulated_time</span> <span class="o">=</span> <span class="n">simulated_curve</span><span class="o">.</span><span class="n">time</span>
+        <span class="n">simulated_flux</span> <span class="o">=</span> <span class="n">simulated_curve</span><span class="o">.</span><span class="n">simulated_flux</span>
+
+        <span class="n">SimulatedCurve</span> <span class="o">=</span> <span class="n">SimulatedPhaseFoldedLightCurve</span><span class="p">(</span><span class="n">time</span><span class="o">=</span><span class="n">time</span><span class="p">,</span> <span class="n">flux</span><span class="o">=</span><span class="n">flux</span><span class="p">,</span> <span class="n">flux_error</span><span class="o">=</span><span class="n">flux_error</span><span class="p">,</span> <span class="n">simulated_time</span><span class="o">=</span><span class="n">simulated_time</span><span class="p">,</span> <span class="n">simulated_flux</span><span class="o">=</span><span class="n">simulated_flux</span><span class="p">,</span> <span class="n">chi2</span><span class="o">=</span><span class="n">chi2</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">SimulatedCurve</span></div>
+
+
+    <span class="k">def</span> <span class="nf">__simulate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">observed_curve</span><span class="p">:</span> <span class="n">LightCurve</span><span class="p">,</span> <span class="n">b_impact</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">p</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">period</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">adivR</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">x_values</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">SimulatedPhaseFoldedLightCurve</span><span class="p">:</span>
+        <span class="n">flux</span> <span class="o">=</span> <span class="p">[]</span>
+
+        <span class="n">simulated_curve</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="nb">len</span><span class="p">(</span><span class="n">x_values</span><span class="p">),</span> <span class="mi">2</span><span class="p">))</span>
+        <span class="n">resampled_simulated_curve</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="nb">len</span><span class="p">(</span><span class="n">observed_curve</span><span class="o">.</span><span class="n">time</span><span class="p">),</span> <span class="mi">2</span><span class="p">))</span>
+
+
+        <span class="n">z</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">((</span><span class="n">np</span><span class="o">.</span><span class="n">power</span><span class="p">(</span><span class="n">x_values</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span> <span class="o">+</span> <span class="n">b_impact</span><span class="o">**</span><span class="mi">2</span><span class="p">))</span>
+
+        <span class="k">for</span> <span class="n">w</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">x_values</span><span class="p">)):</span>
+            <span class="c1"># Application of basic modeling</span>
+            <span class="k">if</span> <span class="p">((</span><span class="mi">1</span><span class="o">+</span><span class="n">p</span><span class="p">)</span> <span class="o">&lt;</span> <span class="n">z</span><span class="p">[</span><span class="n">w</span><span class="p">]):</span>
+                <span class="n">lambda_e</span> <span class="o">=</span> <span class="mi">0</span>
+
+            <span class="k">elif</span> <span class="p">(</span><span class="nb">abs</span><span class="p">(</span><span class="mi">1</span><span class="o">-</span><span class="n">p</span><span class="p">)</span> <span class="o">&lt;</span> <span class="n">z</span><span class="p">[</span><span class="n">w</span><span class="p">]</span> <span class="ow">and</span> <span class="p">(</span><span class="n">z</span><span class="p">[</span><span class="n">w</span><span class="p">]</span> <span class="o">&lt;=</span> <span class="p">(</span><span class="mi">1</span><span class="o">+</span><span class="n">p</span><span class="p">))):</span>
+                <span class="n">k0</span> <span class="o">=</span> <span class="n">acos</span><span class="p">((</span><span class="n">p</span><span class="o">**</span><span class="mi">2</span> <span class="o">+</span> <span class="n">z</span><span class="p">[</span><span class="n">w</span><span class="p">]</span><span class="o">**</span><span class="mi">2</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span><span class="mi">2</span><span class="o">*</span><span class="n">p</span><span class="o">*</span><span class="n">z</span><span class="p">[</span><span class="n">w</span><span class="p">]))</span>
+                <span class="n">k1</span> <span class="o">=</span> <span class="n">acos</span><span class="p">((</span><span class="mi">1</span> <span class="o">-</span> <span class="n">p</span><span class="o">**</span><span class="mi">2</span> <span class="o">+</span> <span class="n">z</span><span class="p">[</span><span class="n">w</span><span class="p">]</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span><span class="mi">2</span><span class="o">*</span><span class="n">z</span><span class="p">[</span><span class="n">w</span><span class="p">]))</span>
+                <span class="n">lambda_e</span> <span class="o">=</span> <span class="p">(</span><span class="mi">1</span><span class="o">/</span><span class="n">pi</span><span class="p">)</span> <span class="o">*</span> <span class="p">(</span><span class="n">p</span><span class="o">**</span><span class="mi">2</span><span class="o">*</span><span class="n">k0</span> <span class="o">+</span> <span class="n">k1</span> <span class="o">-</span> <span class="n">sqrt</span><span class="p">((</span><span class="mi">4</span><span class="o">*</span><span class="n">z</span><span class="p">[</span><span class="n">w</span><span class="p">]</span><span class="o">**</span><span class="mi">2</span> <span class="o">-</span> <span class="p">(</span><span class="mi">1</span><span class="o">+</span><span class="n">z</span><span class="p">[</span><span class="n">w</span><span class="p">]</span><span class="o">**</span><span class="mi">2</span><span class="o">-</span><span class="n">p</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span><span class="o">/</span><span class="p">(</span><span class="mi">4</span><span class="p">)))</span>
+
+            <span class="k">elif</span> <span class="p">(</span><span class="n">z</span><span class="p">[</span><span class="n">w</span><span class="p">]</span> <span class="o">&lt;=</span> <span class="mi">1</span><span class="o">-</span><span class="n">p</span><span class="p">):</span>
+                <span class="n">lambda_e</span> <span class="o">=</span> <span class="n">p</span><span class="o">**</span><span class="mi">2</span>
+
+            <span class="k">elif</span> <span class="p">(</span><span class="n">z</span><span class="p">[</span><span class="n">w</span><span class="p">]</span> <span class="o">&lt;=</span> <span class="n">p</span><span class="o">-</span><span class="mi">1</span><span class="p">):</span>
+                <span class="n">lambda_e</span> <span class="o">=</span> <span class="mi">1</span>
+
+            <span class="c1"># Application of limb darkening</span>
+            <span class="n">a</span> <span class="o">=</span> <span class="p">(</span><span class="n">z</span><span class="p">[</span><span class="n">w</span><span class="p">]</span><span class="o">-</span><span class="n">p</span><span class="p">)</span><span class="o">**</span><span class="mi">2</span>
+            <span class="n">b</span> <span class="o">=</span> <span class="p">(</span><span class="n">z</span><span class="p">[</span><span class="n">w</span><span class="p">]</span><span class="o">+</span><span class="n">p</span><span class="p">)</span><span class="o">**</span><span class="mi">2</span>
+            <span class="k">try</span><span class="p">:</span> 
+                <span class="n">k</span> <span class="o">=</span> <span class="n">sqrt</span><span class="p">((</span><span class="mi">1</span><span class="o">-</span><span class="n">a</span><span class="p">)</span><span class="o">/</span><span class="p">(</span><span class="mi">4</span><span class="o">*</span><span class="n">z</span><span class="p">[</span><span class="n">w</span><span class="p">]</span><span class="o">*</span><span class="n">p</span><span class="p">))</span>
+            <span class="k">except</span> <span class="p">:</span>
+                <span class="c1"># print(&#39;Math domain error: &#39;)</span>
+                <span class="c1"># print(&#39;Trying to calculate sqrt of&#39;, (1-a)/(4*z[w]*p))</span>
+                <span class="c1"># raise ValueError(&#39;Trying to calculate sqrt of&#39;, (1-a)/(4*z[w]*p))</span>
+                <span class="k">pass</span>
+            <span class="n">q</span> <span class="o">=</span> <span class="p">(</span><span class="n">p</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span> <span class="o">-</span> <span class="p">(</span><span class="n">z</span><span class="p">[</span><span class="n">w</span><span class="p">]</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span>
+            
+            <span class="n">c1</span> <span class="o">=</span> <span class="mi">0</span>
+            <span class="n">c2</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">gamma1</span>
+            <span class="n">c3</span> <span class="o">=</span> <span class="mi">0</span>
+            <span class="n">c4</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">gamma2</span>
+            <span class="n">c0</span> <span class="o">=</span> <span class="mi">1</span> <span class="o">-</span> <span class="n">c1</span> <span class="o">-</span> <span class="n">c2</span> <span class="o">-</span> <span class="n">c3</span> <span class="o">-</span> <span class="n">c4</span>
+
+            <span class="n">Omega</span> <span class="o">=</span> <span class="p">(</span><span class="n">c0</span><span class="o">/</span><span class="mi">4</span><span class="p">)</span> <span class="o">+</span> <span class="p">(</span><span class="n">c1</span><span class="o">/</span><span class="mi">5</span><span class="p">)</span> <span class="o">+</span> <span class="p">(</span><span class="n">c2</span><span class="o">/</span><span class="mi">6</span><span class="p">)</span> <span class="o">+</span> <span class="p">(</span><span class="n">c3</span><span class="o">/</span><span class="mi">7</span><span class="p">)</span> <span class="o">+</span> <span class="p">(</span><span class="n">c4</span><span class="o">/</span><span class="mi">8</span><span class="p">)</span>
+
+            <span class="c1">## Case I</span>
+            <span class="c1"># print(&#39;Case I&#39;) </span>
+            <span class="k">if</span> <span class="p">(</span><span class="n">p</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="n">z</span><span class="p">[</span><span class="n">w</span><span class="p">]</span> <span class="o">&gt;=</span> <span class="mi">1</span><span class="o">+</span><span class="n">p</span><span class="p">):</span>
+                <span class="n">lambda_d</span> <span class="o">=</span> <span class="mi">0</span>
+                <span class="n">eta_d</span> <span class="o">=</span> <span class="mi">0</span>
+                
+                <span class="c1"># print(calculate_flux(c2, c4, Omega, lambda_e, lambda_d, eta_d, p, w, z))</span>
+                <span class="n">flux</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">calculate_flux</span><span class="p">(</span><span class="n">c2</span><span class="p">,</span> <span class="n">c4</span><span class="p">,</span> <span class="n">Omega</span><span class="p">,</span> <span class="n">lambda_e</span><span class="p">,</span> <span class="n">lambda_d</span><span class="p">,</span> <span class="n">eta_d</span><span class="p">,</span> <span class="n">p</span><span class="p">,</span> <span class="n">w</span><span class="p">,</span> <span class="n">z</span><span class="p">))</span>
+
+            <span class="k">elif</span> <span class="p">(</span><span class="n">p</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="n">z</span><span class="p">[</span><span class="n">w</span><span class="p">]</span> <span class="o">&gt;=</span> <span class="mi">0</span><span class="p">):</span>
+                <span class="c1"># print(&#39;Case I.I&#39;)</span>
+                <span class="n">lambda_d</span> <span class="o">=</span> <span class="mi">0</span>
+                <span class="n">eta_d</span> <span class="o">=</span> <span class="mi">0</span> 
+
+                <span class="c1"># print(calculate_flux(c2, c4, Omega, lambda_e, lambda_d, eta_d, p, w, z))</span>
+                <span class="n">flux</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">calculate_flux</span><span class="p">(</span><span class="n">c2</span><span class="p">,</span> <span class="n">c4</span><span class="p">,</span> <span class="n">Omega</span><span class="p">,</span> <span class="n">lambda_e</span><span class="p">,</span> <span class="n">lambda_d</span><span class="p">,</span> <span class="n">eta_d</span><span class="p">,</span> <span class="n">p</span><span class="p">,</span> <span class="n">w</span><span class="p">,</span> <span class="n">z</span><span class="p">))</span>
+
+            <span class="c1">## Case II</span>
+            <span class="k">elif</span> <span class="p">(</span><span class="n">p</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="n">z</span><span class="p">[</span><span class="n">w</span><span class="p">]</span> <span class="o">&gt;</span> <span class="mf">0.5</span><span class="o">+</span><span class="nb">abs</span><span class="p">(</span><span class="n">p</span><span class="o">-</span><span class="mf">0.5</span><span class="p">))</span> <span class="ow">and</span> <span class="p">(</span><span class="n">z</span><span class="p">[</span><span class="n">w</span><span class="p">]</span> <span class="o">&lt;</span> <span class="mi">1</span><span class="o">+</span><span class="n">p</span><span class="p">):</span>
+                <span class="c1"># print(&#39;Case II&#39;)</span>
+                <span class="n">lambda_d</span> <span class="o">=</span> <span class="n">calculate_lambda_1</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">,</span> <span class="n">k</span><span class="p">,</span> <span class="n">p</span><span class="p">,</span> <span class="n">q</span><span class="p">,</span> <span class="n">w</span><span class="p">,</span> <span class="n">z</span><span class="p">)</span>
+                <span class="n">eta_d</span> <span class="o">=</span> <span class="n">calculate_eta_1</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">,</span> <span class="n">k0</span><span class="p">,</span> <span class="n">k1</span><span class="p">,</span> <span class="n">p</span><span class="p">,</span> <span class="n">w</span><span class="p">,</span> <span class="n">z</span><span class="p">)</span>
+                
+                <span class="c1"># print(calculate_flux(c2, c4, Omega, lambda_e, lambda_d, eta_d, p, w, z))</span>
+                <span class="n">flux</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">calculate_flux</span><span class="p">(</span><span class="n">c2</span><span class="p">,</span> <span class="n">c4</span><span class="p">,</span> <span class="n">Omega</span><span class="p">,</span> <span class="n">lambda_e</span><span class="p">,</span> <span class="n">lambda_d</span><span class="p">,</span> <span class="n">eta_d</span><span class="p">,</span> <span class="n">p</span><span class="p">,</span> <span class="n">w</span><span class="p">,</span> <span class="n">z</span><span class="p">))</span>
+
+            <span class="c1">## Case III</span>
+            <span class="k">elif</span> <span class="p">(</span><span class="n">p</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="n">p</span> <span class="o">&lt;</span> <span class="mf">0.5</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="n">z</span><span class="p">[</span><span class="n">w</span><span class="p">]</span> <span class="o">&gt;</span> <span class="n">p</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="n">z</span><span class="p">[</span><span class="n">w</span><span class="p">]</span> <span class="o">&lt;</span> <span class="mi">1</span><span class="o">-</span><span class="n">p</span><span class="p">):</span>
+                <span class="c1"># print(&#39;Case III&#39;)</span>
+                <span class="n">lambda_d</span> <span class="o">=</span> <span class="n">calculate_lambda_2</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">,</span> <span class="n">k</span><span class="p">,</span> <span class="n">p</span><span class="p">,</span> <span class="n">q</span><span class="p">,</span> <span class="n">w</span><span class="p">,</span> <span class="n">z</span><span class="p">)</span>
+                <span class="n">eta_d</span> <span class="o">=</span> <span class="n">calculate_eta_2</span><span class="p">(</span><span class="n">p</span><span class="p">,</span> <span class="n">w</span><span class="p">,</span> <span class="n">z</span><span class="p">)</span>
+
+                <span class="c1"># print(calculate_flux(c2, c4, Omega, lambda_e, lambda_d, eta_d, p, w, z))</span>
+                <span class="n">flux</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">calculate_flux</span><span class="p">(</span><span class="n">c2</span><span class="p">,</span> <span class="n">c4</span><span class="p">,</span> <span class="n">Omega</span><span class="p">,</span> <span class="n">lambda_e</span><span class="p">,</span> <span class="n">lambda_d</span><span class="p">,</span> <span class="n">eta_d</span><span class="p">,</span> <span class="n">p</span><span class="p">,</span> <span class="n">w</span><span class="p">,</span> <span class="n">z</span><span class="p">))</span>
+
+            <span class="c1">## Case IV  </span>
+            <span class="k">elif</span> <span class="p">(</span><span class="n">p</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="n">p</span> <span class="o">&lt;</span> <span class="mf">0.5</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="n">z</span><span class="p">[</span><span class="n">w</span><span class="p">]</span> <span class="o">==</span> <span class="mi">1</span><span class="o">-</span><span class="n">p</span><span class="p">):</span>
+                <span class="c1"># print(&#39;Case IV&#39;)</span>
+                <span class="n">lambda_d</span> <span class="o">=</span> <span class="n">calculate_lambda_5</span><span class="p">(</span><span class="n">p</span><span class="p">)</span>
+                <span class="n">eta_d</span> <span class="o">=</span> <span class="n">calculate_eta_2</span><span class="p">(</span><span class="n">p</span><span class="p">,</span> <span class="n">w</span><span class="p">,</span> <span class="n">z</span><span class="p">)</span>
+                
+                <span class="c1"># print(calculate_flux(c2, c4, Omega, lambda_e, lambda_d, eta_d, p, w, z))</span>
+                <span class="n">flux</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">calculate_flux</span><span class="p">(</span><span class="n">c2</span><span class="p">,</span> <span class="n">c4</span><span class="p">,</span> <span class="n">Omega</span><span class="p">,</span> <span class="n">lambda_e</span><span class="p">,</span> <span class="n">lambda_d</span><span class="p">,</span> <span class="n">eta_d</span><span class="p">,</span> <span class="n">p</span><span class="p">,</span> <span class="n">w</span><span class="p">,</span> <span class="n">z</span><span class="p">))</span>
+
+            <span class="c1">## Case V</span>
+            <span class="k">elif</span> <span class="p">(</span><span class="n">p</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="n">p</span> <span class="o">&lt;</span> <span class="mf">0.5</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="n">z</span><span class="p">[</span><span class="n">w</span><span class="p">]</span> <span class="o">==</span> <span class="n">p</span><span class="p">):</span>
+                <span class="c1"># print(&#39;Case V&#39;)</span>
+                <span class="n">lambda_d</span> <span class="o">=</span> <span class="n">calculate_lambda_4</span><span class="p">(</span><span class="n">p</span><span class="p">)</span>
+                <span class="n">eta_d</span> <span class="o">=</span> <span class="n">calculate_eta_2</span><span class="p">(</span><span class="n">p</span><span class="p">,</span> <span class="n">w</span><span class="p">,</span> <span class="n">z</span><span class="p">)</span>
+
+                <span class="c1"># print(calculate_flux(c2, c4, Omega, lambda_e, lambda_d, eta_d, p, w, z))</span>
+                <span class="n">flux</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">calculate_flux</span><span class="p">(</span><span class="n">c2</span><span class="p">,</span> <span class="n">c4</span><span class="p">,</span> <span class="n">Omega</span><span class="p">,</span> <span class="n">lambda_e</span><span class="p">,</span> <span class="n">lambda_d</span><span class="p">,</span> <span class="n">eta_d</span><span class="p">,</span> <span class="n">p</span><span class="p">,</span> <span class="n">w</span><span class="p">,</span> <span class="n">z</span><span class="p">))</span>
+
+            <span class="c1">## Case VI</span>
+            <span class="k">elif</span> <span class="p">(</span><span class="n">p</span> <span class="o">==</span> <span class="mf">0.5</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="n">z</span><span class="p">[</span><span class="n">w</span><span class="p">]</span> <span class="o">==</span> <span class="mf">0.5</span><span class="p">):</span>
+                <span class="c1"># print(&#39;Case VI&#39;)</span>
+                <span class="n">lambda_d</span> <span class="o">=</span> <span class="p">(</span><span class="mi">1</span><span class="o">/</span><span class="mi">3</span><span class="p">)</span> <span class="o">-</span> <span class="p">(</span><span class="mi">4</span><span class="o">/</span><span class="p">(</span><span class="mi">9</span><span class="o">*</span><span class="n">pi</span><span class="p">))</span>
+                <span class="n">eta_d</span> <span class="o">=</span> <span class="mi">3</span><span class="o">/</span><span class="mi">32</span>
+
+                <span class="c1"># print(calculate_flux(c2, c4, Omega, lambda_e, lambda_d, eta_d, p, w, z))</span>
+                <span class="n">flux</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">calculate_flux</span><span class="p">(</span><span class="n">c2</span><span class="p">,</span> <span class="n">c4</span><span class="p">,</span> <span class="n">Omega</span><span class="p">,</span> <span class="n">lambda_e</span><span class="p">,</span> <span class="n">lambda_d</span><span class="p">,</span> <span class="n">eta_d</span><span class="p">,</span> <span class="n">p</span><span class="p">,</span> <span class="n">w</span><span class="p">,</span> <span class="n">z</span><span class="p">))</span>
+
+            <span class="c1">## Case VII</span>
+            <span class="k">elif</span> <span class="p">(</span><span class="n">p</span> <span class="o">&gt;</span> <span class="mf">0.5</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="n">z</span><span class="p">[</span><span class="n">w</span><span class="p">]</span> <span class="o">==</span> <span class="n">p</span><span class="p">):</span>
+                <span class="c1"># print(&#39;Case VII&#39;)</span>
+                <span class="n">lambda_d</span> <span class="o">=</span> <span class="n">calculate_lambda_3</span><span class="p">(</span><span class="n">p</span><span class="p">)</span>
+                <span class="n">eta_d</span> <span class="o">=</span> <span class="n">calculate_eta_1</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">,</span> <span class="n">k0</span><span class="p">,</span> <span class="n">k1</span><span class="p">,</span> <span class="n">p</span><span class="p">,</span> <span class="n">w</span><span class="p">,</span> <span class="n">z</span><span class="p">)</span>
+
+                <span class="c1"># print(calculate_flux(c2, c4, Omega, lambda_e, lambda_d, eta_d, p, w, z))</span>
+                <span class="n">flux</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">calculate_flux</span><span class="p">(</span><span class="n">c2</span><span class="p">,</span> <span class="n">c4</span><span class="p">,</span> <span class="n">Omega</span><span class="p">,</span> <span class="n">lambda_e</span><span class="p">,</span> <span class="n">lambda_d</span><span class="p">,</span> <span class="n">eta_d</span><span class="p">,</span> <span class="n">p</span><span class="p">,</span> <span class="n">w</span><span class="p">,</span> <span class="n">z</span><span class="p">))</span>
+
+            <span class="c1">## Case VIII</span>
+            <span class="k">elif</span> <span class="p">(</span><span class="n">p</span> <span class="o">&gt;</span> <span class="mf">0.5</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="n">z</span><span class="p">[</span><span class="n">w</span><span class="p">]</span> <span class="o">&gt;=</span> <span class="nb">abs</span><span class="p">(</span><span class="mi">1</span><span class="o">-</span><span class="n">p</span><span class="p">))</span> <span class="ow">and</span> <span class="p">(</span><span class="n">z</span><span class="p">[</span><span class="n">w</span><span class="p">]</span> <span class="o">&lt;</span> <span class="n">p</span><span class="p">):</span>
+                <span class="c1"># print(&#39;Case VIII&#39;)</span>
+                <span class="n">lambda_d</span> <span class="o">=</span> <span class="n">calculate_lambda_1</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">,</span> <span class="n">k</span><span class="p">,</span> <span class="n">p</span><span class="p">,</span> <span class="n">q</span><span class="p">,</span> <span class="n">w</span><span class="p">,</span> <span class="n">z</span><span class="p">)</span>
+                <span class="n">eta_d</span> <span class="o">=</span> <span class="n">calculate_eta_1</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">,</span> <span class="n">k0</span><span class="p">,</span> <span class="n">k1</span><span class="p">,</span> <span class="n">p</span><span class="p">,</span> <span class="n">w</span><span class="p">,</span> <span class="n">z</span><span class="p">)</span>
+
+                <span class="c1"># print(calculate_flux(c2, c4, Omega, lambda_e, lambda_d, eta_d, p, w, z))</span>
+                <span class="n">flux</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">calculate_flux</span><span class="p">(</span><span class="n">c2</span><span class="p">,</span> <span class="n">c4</span><span class="p">,</span> <span class="n">Omega</span><span class="p">,</span> <span class="n">lambda_e</span><span class="p">,</span> <span class="n">lambda_d</span><span class="p">,</span> <span class="n">eta_d</span><span class="p">,</span> <span class="n">p</span><span class="p">,</span> <span class="n">w</span><span class="p">,</span> <span class="n">z</span><span class="p">))</span>
+
+            <span class="c1">## Case IX</span>
+            <span class="k">elif</span> <span class="p">(</span><span class="n">p</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="n">p</span> <span class="o">&lt;</span> <span class="mi">1</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="n">z</span><span class="p">[</span><span class="n">w</span><span class="p">]</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="n">z</span><span class="p">[</span><span class="n">w</span><span class="p">]</span> <span class="o">&lt;</span> <span class="mf">0.5</span><span class="o">-</span><span class="nb">abs</span><span class="p">(</span><span class="n">p</span><span class="o">-</span><span class="mf">0.5</span><span class="p">)):</span>
+                <span class="c1"># print(&#39;Case IX&#39;)</span>
+                <span class="n">lambda_d</span> <span class="o">=</span> <span class="n">calculate_lambda_2</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">,</span> <span class="n">k</span><span class="p">,</span> <span class="n">p</span><span class="p">,</span> <span class="n">q</span><span class="p">,</span> <span class="n">w</span><span class="p">,</span> <span class="n">z</span><span class="p">)</span>
+                <span class="n">eta_d</span> <span class="o">=</span> <span class="n">calculate_eta_2</span><span class="p">(</span><span class="n">p</span><span class="p">,</span> <span class="n">w</span><span class="p">,</span> <span class="n">z</span><span class="p">)</span>
+
+                <span class="c1"># print(calculate_flux(c2, c4, Omega, lambda_e, lambda_d, eta_d, p, w, z))</span>
+                <span class="n">flux</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">calculate_flux</span><span class="p">(</span><span class="n">c2</span><span class="p">,</span> <span class="n">c4</span><span class="p">,</span> <span class="n">Omega</span><span class="p">,</span> <span class="n">lambda_e</span><span class="p">,</span> <span class="n">lambda_d</span><span class="p">,</span> <span class="n">eta_d</span><span class="p">,</span> <span class="n">p</span><span class="p">,</span> <span class="n">w</span><span class="p">,</span> <span class="n">z</span><span class="p">))</span>
+
+            <span class="c1">## Case X</span>
+            <span class="k">elif</span> <span class="p">(</span><span class="n">p</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="n">p</span> <span class="o">&lt;</span> <span class="mi">1</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="n">z</span><span class="p">[</span><span class="n">w</span><span class="p">]</span> <span class="o">==</span> <span class="mi">0</span><span class="p">):</span>
+                <span class="c1"># print(&#39;Case X&#39;)</span>
+                <span class="n">lambda_d</span> <span class="o">=</span> <span class="n">calculate_lambda_6</span><span class="p">(</span><span class="n">p</span><span class="p">)</span>
+                <span class="n">eta_d</span> <span class="o">=</span> <span class="n">calculate_eta_2</span><span class="p">(</span><span class="n">p</span><span class="p">,</span> <span class="n">w</span><span class="p">,</span> <span class="n">z</span><span class="p">)</span>
+
+                <span class="c1"># print(calculate_flux(c2, c4, Omega, lambda_e, lambda_d, eta_d, p, w, z))</span>
+                <span class="n">flux</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">calculate_flux</span><span class="p">(</span><span class="n">c2</span><span class="p">,</span> <span class="n">c4</span><span class="p">,</span> <span class="n">Omega</span><span class="p">,</span> <span class="n">lambda_e</span><span class="p">,</span> <span class="n">lambda_d</span><span class="p">,</span> <span class="n">eta_d</span><span class="p">,</span> <span class="n">p</span><span class="p">,</span> <span class="n">w</span><span class="p">,</span> <span class="n">z</span><span class="p">))</span>
+
+            <span class="c1">## Case XI</span>
+            <span class="k">elif</span> <span class="p">(</span><span class="n">p</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="n">z</span><span class="p">[</span><span class="n">w</span><span class="p">]</span> <span class="o">&gt;=</span> <span class="mi">0</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="n">z</span><span class="p">[</span><span class="n">w</span><span class="p">]</span> <span class="o">&lt;</span> <span class="n">p</span><span class="o">-</span><span class="mi">1</span><span class="p">):</span>
+                <span class="c1"># print(&#39;Case XI&#39;)</span>
+                <span class="n">lambda_d</span> <span class="o">=</span> <span class="mi">1</span>
+                <span class="n">eta_d</span> <span class="o">=</span> <span class="mi">1</span>
+
+                <span class="c1"># print(calculate_flux(c2, c4, Omega, lambda_e, lambda_d, eta_d, p, w, z))</span>
+                <span class="n">flux</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">calculate_flux</span><span class="p">(</span><span class="n">c2</span><span class="p">,</span> <span class="n">c4</span><span class="p">,</span> <span class="n">Omega</span><span class="p">,</span> <span class="n">lambda_e</span><span class="p">,</span> <span class="n">lambda_d</span><span class="p">,</span> <span class="n">eta_d</span><span class="p">,</span> <span class="n">p</span><span class="p">,</span> <span class="n">w</span><span class="p">,</span> <span class="n">z</span><span class="p">))</span>
+        
+        <span class="c1"># x -&gt; time</span>
+        <span class="n">ttrans</span> <span class="o">=</span> <span class="n">period</span><span class="o">/</span><span class="p">(</span><span class="n">pi</span> <span class="o">*</span> <span class="n">adivR</span><span class="p">)</span>
+        <span class="n">mid</span> <span class="o">=</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">x_values</span><span class="p">)</span><span class="o">/</span><span class="mi">2</span><span class="p">)</span> <span class="o">-</span> <span class="mf">0.5</span>
+
+        <span class="k">for</span> <span class="n">u</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">x_values</span><span class="p">)):</span>
+            <span class="k">if</span> <span class="p">(</span><span class="n">u</span> <span class="o">&lt;</span> <span class="n">mid</span><span class="p">):</span>
+                <span class="n">simulated_curve</span><span class="p">[</span><span class="n">u</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span><span class="o">*</span><span class="n">x_values</span><span class="p">[</span><span class="n">u</span><span class="p">]</span><span class="o">*</span><span class="n">ttrans</span><span class="o">/</span><span class="mi">2</span>
+            <span class="k">elif</span> <span class="p">(</span><span class="n">u</span> <span class="o">&gt;=</span> <span class="n">mid</span><span class="p">):</span>
+                <span class="n">simulated_curve</span><span class="p">[</span><span class="n">u</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">x_values</span><span class="p">[</span><span class="n">u</span><span class="p">]</span><span class="o">*</span><span class="n">ttrans</span><span class="o">/</span><span class="mi">2</span>
+
+        <span class="n">simulated_curve</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">flux</span><span class="p">[:]</span>
+
+        <span class="c1"># Resampling   </span>
+        <span class="n">resampled_simulated_curve</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">observed_curve</span><span class="o">.</span><span class="n">time</span>
+        <span class="n">resampled_simulated_curve</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">scs</span><span class="o">.</span><span class="n">resample</span><span class="p">(</span><span class="n">simulated_curve</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">],</span> <span class="nb">len</span><span class="p">(</span><span class="n">observed_curve</span><span class="o">.</span><span class="n">time</span><span class="p">))</span>
+
+        <span class="c1"># return SimulatedPhaseFoldedLightCurve(resampled_simulated_curve[:, 0], resampled_simulated_curve[:, 1])</span>
+        <span class="k">return</span> <span class="n">SimulatedPhaseFoldedLightCurve</span><span class="p">(</span><span class="n">time</span><span class="o">=</span><span class="n">observed_curve</span><span class="o">.</span><span class="n">time</span><span class="p">,</span> <span class="n">flux</span><span class="o">=</span><span class="n">observed_curve</span><span class="o">.</span><span class="n">flux</span><span class="p">,</span> <span class="n">flux_error</span><span class="o">=</span><span class="n">observed_curve</span><span class="o">.</span><span class="n">flux_error</span><span class="p">,</span> <span class="n">simulated_time</span><span class="o">=</span><span class="n">resampled_simulated_curve</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">],</span> <span class="n">simulated_flux</span><span class="o">=</span><span class="n">resampled_simulated_curve</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">],</span> <span class="n">chi2</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
+            
+       
+    <span class="k">def</span> <span class="nf">__calculate_chi2</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">observed_curve</span><span class="p">:</span> <span class="n">LightCurve</span><span class="p">,</span> <span class="n">simulated_curve</span><span class="p">:</span> <span class="n">SimulatedPhaseFoldedLightCurve</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+        <span class="n">chi2</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="n">chi2</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">(((</span><span class="n">observed_curve</span><span class="o">.</span><span class="n">flux</span> <span class="o">-</span> <span class="n">simulated_curve</span><span class="o">.</span><span class="n">simulated_flux</span><span class="p">)</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span><span class="o">/</span><span class="p">(</span><span class="n">observed_curve</span><span class="o">.</span><span class="n">flux_error</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span> <span class="p">)</span>
+        <span class="k">return</span> <span class="n">chi2</span></div>
+
+</pre></div>
+
+              </div>
+              
+              
+              <div class='prev-next-bottom'>
+                
+
+              </div>
+              
+          </main>
+          
+
+      </div>
+    </div>
+  
+  <script src="../../../_static/js/index.1c5a1a01449ed65a7b51.js"></script>
+
+  <footer class="footer mt-5 mt-md-0">
+  <div class="container">
+    
+    <div class="footer-item">
+      <p class="copyright">
+    &copy; Copyright 2021, Guilherme Samuel.<br/>
+</p>
+    </div>
+    
+    <div class="footer-item">
+      <p class="sphinx-version">
+Created using <a href="http://sphinx-doc.org/">Sphinx</a> 4.2.0.<br/>
+</p>
+    </div>
+    
+  </div>
+</footer>
+  </body>
+</html>

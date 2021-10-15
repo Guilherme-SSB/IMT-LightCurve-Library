@@ -8,7 +8,7 @@ from math import exp, factorial
 import lightkurve as lk
 import numpy as np
 import pandas as pd
-from control import TransferFunction, evalfr
+# from control import TransferFunction, evalfr
 
 from scipy.signal import medfilt
 from tabulate import tabulate  # Fancy compare results
@@ -180,49 +180,7 @@ class LightCurve(BaseLightCurve):
         return self.__apply_filter(self.time, self.flux, filter_technique='median', numNei=numNei, numExpansion=numExpansion, cutoff_freq=None, order=None)
 
     def fold(self, smooth_curve: bool=False, window: float=0.15, window_filter: int=201, order_filter: int=3):
-        lightkurve = lk.LightCurve(time=self.time, flux=self.flux)
-
-        # Grid os peridods to search
-        period = np.linspace(1, 10, 1000)
-
-        # Create a BLS Periodogram
-        bls = lightkurve.to_periodogram('bls', period=period, frequency_factor=500)
-
-        # Extracting info about the BLS Periodogram
-        planet_b_period = bls.period_at_max_power
-        planet_b_t0 = bls.transit_time_at_max_power
-
-        # Folded parameters
-        folded_time = lightkurve.flatten().normalize().fold(period=planet_b_period, epoch_time=planet_b_t0).time.value
-        folded_flux = lightkurve.flatten().normalize().fold(period=planet_b_period, epoch_time=planet_b_t0).flux.value
-        # folded_flux_error = lightkurve.flatten().normalize().fold(period=planet_b_period, epoch_time=planet_b_t0).flux_err.value
-
-        # Windowing curve
-        time_w = folded_time[(folded_time > -1*window) & (folded_time < window)]
-        flux_w = folded_flux[(folded_time > -1*window) & (folded_time < window)]
-
-        if smooth_curve:
-            # Smoothing curve
-            smoothed_flux = self.__savitzky_golay(flux_w, window_size=window_filter, order=order_filter)
-
-            # Uncertainties
-            folded_flux_error = np.std(smoothed_flux)
-            folded_flux_error_array = [folded_flux_error for i in range(len(time_w))]
-
-            # Return
-            returnCurve = PhaseFoldedLightCurve(time=time_w, flux=smoothed_flux)
-            returnCurve.flux_error = folded_flux_error_array
-            return returnCurve
-
-        # Uncertainties
-        folded_flux_error = np.std(flux_w)
-        folded_flux_error_array = [folded_flux_error for i in range(len(time_w))]
-
-        # Return
-        returnCurve = PhaseFoldedLightCurve(time=time_w, flux=flux_w)
-        # returnCurve = PhaseFoldedLightCurve(time=folded_time, flux=folded_flux)
-        returnCurve.flux_error = folded_flux_error_array
-        return returnCurve
+        raise NotImplementedError('Not implemented yet')
 
     def export_filters_to_csv(
             self,
@@ -369,75 +327,6 @@ class LightCurve(BaseLightCurve):
                                 pbar.update(1)
 
         print(f'\nData from {FILTER_TECHNIQUE} has been saved successfully!')
-
-    def __savitzky_golay(self, y, window_size, order, deriv=0, rate=1):
-        r"""Smooth (and optionally differentiate) data with a Savitzky-Golay filter.
-        The Savitzky-Golay filter removes high frequency noise from data.
-        It has the advantage of preserving the original shape and
-        features of the signal better than other types of filtering
-        approaches, such as moving averages techniques.
-        Parameters
-        ----------
-        y : array_like, shape (N,)
-            the values of the time history of the signal.
-        window_size : int
-            the length of the window. Must be an odd integer number.
-        order : int
-            the order of the polynomial used in the filtering.
-            Must be less then `window_size` - 1.
-        deriv: int
-            the order of the derivative to compute (default = 0 means only smoothing)
-        Returns
-        -------
-        ys : ndarray, shape (N)
-            the smoothed signal (or it's n-th derivative).
-        Notes
-        -----
-        The Savitzky-Golay is a type of low-pass filter, particularly
-        suited for smoothing noisy data. The main idea behind this
-        approach is to make for each point a least-square fit with a
-        polynomial of high order over a odd-sized window centered at
-        the point.
-        Examples
-        --------
-        t = np.linspace(-4, 4, 500)
-        y = np.exp( -t**2 ) + np.random.normal(0, 0.05, t.shape)
-        ysg = savitzky_golay(y, window_size=31, order=4)
-        import matplotlib.pyplot as plt
-        plt.plot(t, y, label='Noisy signal')
-        plt.plot(t, np.exp(-t**2), 'k', lw=1.5, label='Original signal')
-        plt.plot(t, ysg, 'r', label='Filtered signal')
-        plt.legend()
-        plt.show()
-        References
-        ----------
-        .. [1] A. Savitzky, M. J. E. Golay, Smoothing and Differentiation of
-        Data by Simplified Least Squares Procedures. Analytical
-        Chemistry, 1964, 36 (8), pp 1627-1639.
-        .. [2] Numerical Recipes 3rd Edition: The Art of Scientific Computing
-        W.H. Press, S.A. Teukolsky, W.T. Vetterling, B.P. Flannery
-        Cambridge University Press ISBN-13: 9780521880688
-        """
-        try:
-            window_size = np.abs(int(window_size))
-            order = np.abs(int(order))
-        except ValueError as err:
-            raise ValueError("window_size and order have to be of type int")
-        if window_size % 2 != 1 or window_size < 1:
-            raise TypeError("window_size size must be a positive odd number")
-        if window_size < order + 2:
-            raise TypeError("window_size is too small for the polynomials order")
-        order_range = range(order+1)
-        half_window = (window_size -1) // 2
-        # precompute coefficients
-        b = np.mat([[k**i for i in order_range] for k in range(-half_window, half_window+1)])
-        m = np.linalg.pinv(b).A[deriv] * rate**deriv * factorial(deriv)
-        # pad the signal at the extremes with
-        # values taken from the signal itself
-        firstvals = y[0] - np.abs( y[1:half_window+1][::-1] - y[0] )
-        lastvals = y[-1] + np.abs(y[-half_window-1:-1][::-1] - y[-1])
-        y = np.concatenate((firstvals, y, lastvals))
-        return np.convolve( m[::-1], y, mode='valid')
 
     def __replace_negative_values(array: np.ndarray) -> np.ndarray:
         array[array < 0] = 0

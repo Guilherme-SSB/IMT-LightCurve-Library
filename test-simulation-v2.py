@@ -8,23 +8,33 @@ from imt_lightcurve.simulation.simulation import Simulate
 from imt_lightcurve.visualization.data_viz import multi_line_plot
 
 # Chosen a LightCurve to simulation process
-LIGHTCURVE = 'RESAMPLED_0101086161_20070516T060226'
+LIGHTCURVE = 'RESAMPLED_0101206560_20070516T060226'
 
+from imt_lightcurve.models.lightcurve import LightCurve
 
-# Importing lightcurve data from github
-data = pd.read_csv('https://raw.githubusercontent.com/Guilherme-SSB/IC-CoRoT_Kepler/main/resampled_files/' + LIGHTCURVE + '.csv')
-time = data.DATE.to_numpy()
-flux = data.WHITEFLUX.to_numpy()
-curve = LightCurve(time, flux)
-curve.plot()
+time = np.loadtxt(r"C:\Users\guisa\Desktop\time_folded.txt")
+flux = np.loadtxt(r"C:\Users\guisa\Desktop\flux_folded.txt")
+folded_curve = LightCurve(time, flux)
+error = np.std(folded_curve.flux)
+error_array = [error for i in range(len(folded_curve.flux))]
+folded_curve.flux_error = error_array
 
-# Folding lightcurve
-folded_curve = curve.fold(window=0.15, smooth_curve=False)
-# folded_curve.plot()
-folded_curve_smooth = curve.fold(window=0.15, smooth_curve=True)
+folded_curve.plot()
 
-## Ploting results
-multi_line_plot(folded_curve.time, folded_curve.flux, folded_curve_smooth.flux)
+# # Importing lightcurve data from github
+# data = pd.read_csv('https://raw.githubusercontent.com/Guilherme-SSB/IC-CoRoT_Kepler/main/resampled_files/' + LIGHTCURVE + '.csv')
+# time = data.DATE.to_numpy()
+# flux = data.WHITEFLUX.to_numpy()
+# curve = LightCurve(time, flux)
+# curve.plot()
+
+# # Folding lightcurve
+# folded_curve = curve.fold(window=0.15, smooth_curve=False)
+# # folded_curve.plot()
+# folded_curve_smooth = curve.fold(window=0.15, smooth_curve=True)
+
+# ## Ploting results
+# multi_line_plot(folded_curve.time, folded_curve.flux, folded_curve_smooth.flux)
 
 
 

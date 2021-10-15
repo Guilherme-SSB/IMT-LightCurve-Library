@@ -15,10 +15,16 @@ contain the root `toctree` directive.
 
 
 Documentation
--------------
+--------------
 
 .. toctree::
     :maxdepth: 1
     :titlesonly:
 
     quickstart <quickstart.ipynb>
+
+.. toctree::
+    :maxdepth: 3
+    :caption: Code API
+
+    modules

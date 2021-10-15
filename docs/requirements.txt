@@ -1,2 +1,4 @@
 nbsphinx
 pydata_sphinx_theme
+sphinx>=1.4
+ipykernel

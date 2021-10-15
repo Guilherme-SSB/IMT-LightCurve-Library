@@ -1,0 +1,316 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>imt_lightcurve.help_functions.simulation_helper &#8212; IMT-LightCurve Library 1.0 documentation</title>
+    
+  <link href="../../../_static/css/theme.css" rel="stylesheet" />
+  <link href="../../../_static/css/index.c5995385ac14fb8791e8eb36b4908be2.css" rel="stylesheet" />
+
+    
+  <link rel="stylesheet"
+    href="../../../_static/vendor/fontawesome/5.13.0/css/all.min.css">
+  <link rel="preload" as="font" type="font/woff2" crossorigin
+    href="../../../_static/vendor/fontawesome/5.13.0/webfonts/fa-solid-900.woff2">
+  <link rel="preload" as="font" type="font/woff2" crossorigin
+    href="../../../_static/vendor/fontawesome/5.13.0/webfonts/fa-brands-400.woff2">
+
+    
+      
+
+    
+    <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/basic.css" />
+    
+  <link rel="preload" as="script" href="../../../_static/js/index.1c5a1a01449ed65a7b51.js">
+
+    <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
+    <script src="../../../_static/jquery.js"></script>
+    <script src="../../../_static/underscore.js"></script>
+    <script src="../../../_static/doctools.js"></script>
+    <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="docsearch:language" content="en" />
+    
+  </head>
+  <body data-spy="scroll" data-target="#bd-toc-nav" data-offset="80">
+    
+    <div class="container-fluid" id="banner"></div>
+
+    
+    <nav class="navbar navbar-light navbar-expand-lg bg-light fixed-top bd-navbar" id="navbar-main"><div class="container-xl">
+
+  <div id="navbar-start">
+    
+    
+<a class="navbar-brand" href="../../../index.html">
+<p class="title">IMT-LightCurve Library</p>
+</a>
+
+    
+  </div>
+
+  <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbar-collapsible" aria-controls="navbar-collapsible" aria-expanded="false" aria-label="Toggle navigation">
+    <span class="navbar-toggler-icon"></span>
+  </button>
+
+  
+  <div id="navbar-collapsible" class="col-lg-9 collapse navbar-collapse">
+    <div id="navbar-center" class="mr-auto">
+      
+      <div class="navbar-center-item">
+        <ul id="navbar-main-elements" class="navbar-nav">
+    <li class="toctree-l1 nav-item">
+ <a class="reference internal nav-link" href="../../../quickstart.html">
+  Quickstart
+ </a>
+</li>
+
+<li class="toctree-l1 nav-item">
+ <a class="reference internal nav-link" href="../../../modules.html">
+  IMT-LightCurve
+ </a>
+</li>
+
+    
+</ul>
+      </div>
+      
+    </div>
+
+    <div id="navbar-end">
+      
+      <div class="navbar-end-item">
+        <ul id="navbar-icon-links" class="navbar-nav" aria-label="Icon Links">
+      </ul>
+      </div>
+      
+    </div>
+  </div>
+</div>
+    </nav>
+    
+
+    <div class="container-xl">
+      <div class="row">
+          
+            
+            <!-- Only show if we have sidebars configured, else just a small margin  -->
+            <div class="col-12 col-md-3 bd-sidebar"><form class="bd-search d-flex align-items-center" action="../../../search.html" method="get">
+  <i class="icon fas fa-search"></i>
+  <input type="search" class="form-control" name="q" id="search-input" placeholder="Search the docs ..." aria-label="Search the docs ..." autocomplete="off" >
+</form><nav class="bd-links" id="bd-docs-nav" aria-label="Main navigation">
+  <div class="bd-toc-item active">
+    
+  </div>
+</nav>
+            </div>
+            
+          
+
+          
+          <div class="d-none d-xl-block col-xl-2 bd-toc">
+            
+          </div>
+          
+
+          
+          
+            
+          
+          <main class="col-12 col-md-9 col-xl-7 py-md-5 pl-md-5 pr-md-4 bd-content" role="main">
+              
+              <div>
+                
+  <h1>Source code for imt_lightcurve.help_functions.simulation_helper</h1><div class="highlight"><pre>
+<span></span><span class="kn">from</span> <span class="nn">math</span> <span class="kn">import</span> <span class="n">log</span><span class="p">,</span> <span class="n">sqrt</span><span class="p">,</span> <span class="n">pi</span><span class="p">,</span> <span class="n">acos</span>
+
+<div class="viewcode-block" id="ellk"><a class="viewcode-back" href="../../../imt-lightcurve.html#imt_lightcurve.help_functions.simulation_helper.ellk">[docs]</a><span class="k">def</span> <span class="nf">ellk</span><span class="p">(</span><span class="n">k</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Computes polynomial approximation for the complete</span>
+<span class="sd">    elliptic integral of the first kind (Hasting&#39;s approximation)</span>
+<span class="sd">    https://doi.org/10.2307/2004103</span>
+<span class="sd">    Table II, coefficients values from n=4</span>
+<span class="sd">    :param FLOAT? k: </span>
+<span class="sd">    :return: The complete elliptical integral of the first kind</span>
+<span class="sd">    :rtype: FLOAT?</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">m1</span> <span class="o">=</span> <span class="mi">1</span> <span class="o">-</span> <span class="n">k</span><span class="o">**</span><span class="mi">2</span>
+
+    <span class="c1"># Coefficients for K*</span>
+    <span class="n">a0</span> <span class="o">=</span> <span class="n">log</span><span class="p">(</span><span class="mi">4</span><span class="p">)</span>
+    <span class="n">a1</span> <span class="o">=</span> <span class="mf">0.09666344259</span>
+    <span class="n">a2</span> <span class="o">=</span> <span class="mf">0.03590092383</span>
+    <span class="n">a3</span> <span class="o">=</span> <span class="mf">0.03742563713</span>
+    <span class="n">a4</span> <span class="o">=</span> <span class="mf">0.01451196212</span>
+    <span class="n">b0</span> <span class="o">=</span> <span class="mf">0.5</span>
+    <span class="n">b1</span> <span class="o">=</span> <span class="mf">0.12498593597</span>
+    <span class="n">b2</span> <span class="o">=</span> <span class="mf">0.06880248576</span>
+    <span class="n">b3</span> <span class="o">=</span> <span class="mf">0.03328355346</span>
+    <span class="n">b4</span> <span class="o">=</span> <span class="mf">0.00441787012</span>
+
+    <span class="n">ek1</span> <span class="o">=</span> <span class="n">a0</span><span class="o">+</span><span class="n">m1</span><span class="o">*</span><span class="p">(</span><span class="n">a1</span><span class="o">+</span><span class="n">m1</span><span class="o">*</span><span class="p">(</span><span class="n">a2</span><span class="o">+</span><span class="n">m1</span><span class="o">*</span><span class="p">(</span><span class="n">a3</span><span class="o">+</span><span class="n">m1</span><span class="o">*</span><span class="n">a4</span><span class="p">)))</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">ek2</span> <span class="o">=</span> <span class="p">(</span><span class="n">b0</span><span class="o">+</span><span class="n">m1</span><span class="o">*</span><span class="p">(</span><span class="n">b1</span><span class="o">+</span><span class="n">m1</span><span class="o">*</span><span class="p">(</span><span class="n">b2</span><span class="o">+</span><span class="n">m1</span><span class="o">*</span><span class="p">(</span><span class="n">b3</span><span class="o">+</span><span class="n">m1</span><span class="o">*</span><span class="n">b4</span><span class="p">))))</span><span class="o">*</span><span class="n">log</span><span class="p">(</span><span class="n">m1</span><span class="p">)</span>
+    <span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Trying to calculate log of&#39;</span><span class="p">,</span> <span class="n">m1</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;m1 = 1 - k**2&#39;</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;k = &#39;</span><span class="p">,</span> <span class="n">k</span><span class="p">,</span> <span class="n">end</span><span class="o">=</span><span class="s1">&#39;</span><span class="se">\n\n</span><span class="s1">&#39;</span><span class="p">)</span>
+        <span class="k">raise</span>
+        <span class="c1"># pass</span>
+    
+
+    <span class="k">return</span> <span class="n">ek1</span> <span class="o">-</span> <span class="n">ek2</span></div>
+
+<div class="viewcode-block" id="ellec"><a class="viewcode-back" href="../../../imt-lightcurve.html#imt_lightcurve.help_functions.simulation_helper.ellec">[docs]</a><span class="k">def</span> <span class="nf">ellec</span><span class="p">(</span><span class="n">k</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Computes polynomial approximation for the complete</span>
+<span class="sd">    elliptic integral of the second kind (Hasting&#39;s approximation)</span>
+<span class="sd">    https://doi.org/10.2307/2004103</span>
+<span class="sd">    Table III, coefficients values from n=4</span>
+<span class="sd">    :param float k:</span>
+<span class="sd">    :return: The complete elliptical integral of the second kind</span>
+<span class="sd">    :rtype: </span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">m1</span> <span class="o">=</span> <span class="mi">1</span> <span class="o">-</span> <span class="n">k</span><span class="o">**</span><span class="mi">2</span>
+
+    <span class="c1"># Coefficients for E*</span>
+    <span class="n">c1</span> <span class="o">=</span> <span class="mf">0.44325141463</span>
+    <span class="n">c2</span> <span class="o">=</span> <span class="mf">0.06260601220</span>
+    <span class="n">c3</span> <span class="o">=</span> <span class="mf">0.04757383546</span>
+    <span class="n">c4</span> <span class="o">=</span> <span class="mf">0.01736506451</span>
+    <span class="n">d1</span> <span class="o">=</span> <span class="mf">0.24998368310</span>
+    <span class="n">d2</span> <span class="o">=</span> <span class="mf">0.09200180037</span>
+    <span class="n">d3</span> <span class="o">=</span> <span class="mf">0.04069697526</span>
+    <span class="n">d4</span> <span class="o">=</span> <span class="mf">0.00526449639</span>
+
+    <span class="n">ee1</span> <span class="o">=</span> <span class="mi">1</span><span class="o">+</span><span class="n">m1</span><span class="o">*</span><span class="p">(</span><span class="n">c1</span><span class="o">+</span><span class="n">m1</span><span class="o">*</span><span class="p">(</span><span class="n">c2</span><span class="o">+</span><span class="n">m1</span><span class="o">*</span><span class="p">(</span><span class="n">c3</span><span class="o">+</span><span class="n">m1</span><span class="o">*</span><span class="n">c4</span><span class="p">)))</span>
+    <span class="n">ee2</span> <span class="o">=</span> <span class="n">m1</span><span class="o">*</span><span class="p">(</span><span class="n">d1</span><span class="o">+</span><span class="n">m1</span><span class="o">*</span><span class="p">(</span><span class="n">d2</span><span class="o">+</span><span class="n">m1</span><span class="o">*</span><span class="p">(</span><span class="n">d3</span><span class="o">+</span><span class="n">m1</span><span class="o">*</span><span class="n">d4</span><span class="p">)))</span><span class="o">*</span><span class="n">log</span><span class="p">(</span><span class="mi">1</span><span class="o">/</span><span class="n">m1</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">ee1</span> <span class="o">+</span> <span class="n">ee2</span></div>
+
+<div class="viewcode-block" id="ellpic_bulirsch"><a class="viewcode-back" href="../../../imt-lightcurve.html#imt_lightcurve.help_functions.simulation_helper.ellpic_bulirsch">[docs]</a><span class="k">def</span> <span class="nf">ellpic_bulirsch</span><span class="p">(</span><span class="n">n</span><span class="p">,</span> <span class="n">k</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Computes the complete elliptical integral of the third kind </span>
+<span class="sd">    using the algorithm of Bulirsch (1965)</span>
+<span class="sd">    https://doi.org/10.1007/BF02165405</span>
+<span class="sd">    :param FLOAT? n: </span>
+<span class="sd">    :param FLOAT? k: </span>
+<span class="sd">    :return: The complete elliptical integral of the third kind</span>
+<span class="sd">    :rtype: </span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">kc</span> <span class="o">=</span> <span class="n">sqrt</span><span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="n">k</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span>
+    <span class="n">p</span> <span class="o">=</span> <span class="n">n</span> <span class="o">+</span> <span class="mi">1</span>
+
+    <span class="c1"># if min(p) &lt; 0:</span>
+    <span class="k">if</span> <span class="n">p</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Negative p&#39;</span><span class="p">)</span>
+
+    <span class="n">m0</span> <span class="o">=</span> <span class="mi">1</span>
+    <span class="n">c</span> <span class="o">=</span> <span class="mi">1</span>
+    <span class="n">p</span> <span class="o">=</span> <span class="n">sqrt</span><span class="p">(</span><span class="n">p</span><span class="p">)</span>
+    <span class="n">d</span> <span class="o">=</span> <span class="mi">1</span><span class="o">/</span><span class="n">p</span>
+    <span class="n">e</span> <span class="o">=</span> <span class="n">kc</span>
+    <span class="n">d</span> <span class="o">=</span> <span class="mi">1</span><span class="o">/</span><span class="n">p</span>
+    <span class="n">e</span> <span class="o">=</span> <span class="n">kc</span>
+
+    <span class="nb">iter</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="k">while</span> <span class="nb">iter</span> <span class="o">&lt;</span> <span class="mi">20</span><span class="p">:</span>
+        <span class="n">f</span> <span class="o">=</span> <span class="n">c</span>
+        <span class="n">c</span> <span class="o">=</span> <span class="n">d</span><span class="o">/</span><span class="n">p</span><span class="o">+</span><span class="n">c</span>
+        <span class="n">g</span> <span class="o">=</span> <span class="n">e</span><span class="o">/</span><span class="n">p</span>
+        <span class="n">d</span> <span class="o">=</span> <span class="mi">2</span><span class="o">*</span><span class="p">(</span><span class="n">f</span><span class="o">*</span><span class="n">g</span> <span class="o">+</span> <span class="n">d</span><span class="p">)</span>
+
+        <span class="n">p</span> <span class="o">=</span> <span class="n">g</span> <span class="o">+</span> <span class="n">p</span>
+        <span class="n">g</span> <span class="o">=</span> <span class="n">m0</span>
+        <span class="n">m0</span> <span class="o">=</span> <span class="n">kc</span> <span class="o">+</span> <span class="n">m0</span>
+
+        <span class="c1"># if max(abs(1 - kc/g)) &gt; 1-8:</span>
+        <span class="k">if</span> <span class="p">(</span><span class="nb">abs</span><span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="n">kc</span><span class="o">/</span><span class="n">g</span><span class="p">))</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="o">-</span><span class="mi">8</span><span class="p">:</span>
+            <span class="n">kc</span> <span class="o">=</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">sqrt</span><span class="p">(</span><span class="n">e</span><span class="p">)</span>
+            <span class="n">e</span> <span class="o">=</span> <span class="n">kc</span> <span class="o">*</span> <span class="n">m0</span>
+
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="mf">0.5</span><span class="o">*</span><span class="n">pi</span><span class="o">*</span><span class="p">(</span><span class="n">c</span><span class="o">*</span><span class="n">m0</span><span class="o">+</span><span class="n">d</span><span class="p">)</span><span class="o">/</span><span class="p">(</span><span class="n">m0</span><span class="o">*</span><span class="p">(</span><span class="n">m0</span><span class="o">+</span><span class="n">p</span><span class="p">))</span>
+
+        <span class="nb">iter</span> <span class="o">+=</span> <span class="mi">1</span>
+
+    <span class="k">return</span> <span class="mf">0.5</span><span class="o">*</span><span class="n">pi</span><span class="o">*</span><span class="p">(</span><span class="n">c</span><span class="o">*</span><span class="n">m0</span><span class="o">+</span><span class="n">d</span><span class="p">)</span><span class="o">/</span><span class="p">(</span><span class="n">m0</span><span class="o">*</span><span class="p">(</span><span class="n">m0</span><span class="o">+</span><span class="n">p</span><span class="p">))</span></div>
+
+
+<span class="c1">## Functions from Table 1, Mandel &amp; Agol (2008)</span>
+<div class="viewcode-block" id="calculate_lambda_1"><a class="viewcode-back" href="../../../imt-lightcurve.html#imt_lightcurve.help_functions.simulation_helper.calculate_lambda_1">[docs]</a><span class="k">def</span> <span class="nf">calculate_lambda_1</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">,</span> <span class="n">k</span><span class="p">,</span> <span class="n">p</span><span class="p">,</span> <span class="n">q</span><span class="p">,</span> <span class="n">w</span><span class="p">,</span> <span class="n">z</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+    <span class="k">return</span> <span class="p">(</span><span class="mi">1</span><span class="o">/</span><span class="p">(</span><span class="mi">9</span><span class="o">*</span><span class="n">pi</span><span class="o">*</span><span class="n">sqrt</span><span class="p">(</span><span class="n">p</span><span class="o">*</span><span class="n">z</span><span class="p">[</span><span class="n">w</span><span class="p">])))</span> <span class="o">*</span> <span class="p">(((</span><span class="mi">1</span><span class="o">-</span><span class="n">b</span><span class="p">)</span><span class="o">*</span><span class="p">(</span><span class="mi">2</span><span class="o">*</span><span class="n">b</span><span class="o">+</span><span class="n">a</span><span class="o">-</span><span class="mi">3</span><span class="p">)</span><span class="o">-</span><span class="mi">3</span><span class="o">*</span><span class="n">q</span><span class="o">*</span><span class="p">(</span><span class="n">b</span><span class="o">-</span><span class="mi">2</span><span class="p">))</span><span class="o">*</span><span class="n">ellk</span><span class="p">(</span><span class="n">k</span><span class="p">)</span><span class="o">+</span><span class="mi">4</span><span class="o">*</span><span class="n">p</span><span class="o">*</span><span class="n">z</span><span class="p">[</span><span class="n">w</span><span class="p">]</span><span class="o">*</span><span class="p">(</span><span class="n">z</span><span class="p">[</span><span class="n">w</span><span class="p">]</span><span class="o">**</span><span class="mi">2</span><span class="o">+</span><span class="mi">7</span><span class="o">*</span><span class="n">p</span><span class="o">**</span><span class="mi">2</span><span class="o">-</span><span class="mi">4</span><span class="p">)</span><span class="o">*</span><span class="n">ellec</span><span class="p">(</span><span class="n">k</span><span class="p">)</span><span class="o">-</span><span class="p">(</span><span class="mi">3</span><span class="o">*</span><span class="n">q</span><span class="o">/</span><span class="n">a</span><span class="p">)</span><span class="o">*</span><span class="n">ellpic_bulirsch</span><span class="p">(</span><span class="nb">abs</span><span class="p">((</span><span class="n">a</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span><span class="o">/</span><span class="n">a</span><span class="p">),</span> <span class="n">k</span><span class="p">))</span></div>
+
+<div class="viewcode-block" id="calculate_lambda_2"><a class="viewcode-back" href="../../../imt-lightcurve.html#imt_lightcurve.help_functions.simulation_helper.calculate_lambda_2">[docs]</a><span class="k">def</span> <span class="nf">calculate_lambda_2</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">,</span> <span class="n">k</span><span class="p">,</span> <span class="n">p</span><span class="p">,</span> <span class="n">q</span><span class="p">,</span> <span class="n">w</span><span class="p">,</span> <span class="n">z</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+    <span class="k">return</span> <span class="p">(</span><span class="mi">2</span><span class="o">/</span><span class="p">(</span><span class="mi">9</span><span class="o">*</span><span class="n">pi</span><span class="o">*</span><span class="n">sqrt</span><span class="p">(</span><span class="mi">1</span><span class="o">-</span><span class="n">a</span><span class="p">)))</span> <span class="o">*</span> <span class="p">((</span><span class="mi">1</span><span class="o">-</span><span class="mi">5</span><span class="o">*</span><span class="n">z</span><span class="p">[</span><span class="n">w</span><span class="p">]</span><span class="o">**</span><span class="mi">2</span><span class="o">+</span><span class="n">p</span><span class="o">**</span><span class="mi">2</span> <span class="o">+</span> <span class="n">q</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span><span class="o">*</span><span class="n">ellk</span><span class="p">(</span><span class="n">k</span><span class="o">**</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">))</span><span class="o">+</span><span class="p">(</span><span class="mi">1</span><span class="o">-</span><span class="n">a</span><span class="p">)</span><span class="o">*</span><span class="p">(</span><span class="n">z</span><span class="p">[</span><span class="n">w</span><span class="p">]</span><span class="o">**</span><span class="mi">2</span><span class="o">+</span><span class="mi">7</span><span class="o">*</span><span class="n">p</span><span class="o">**</span><span class="mi">2</span><span class="o">-</span><span class="mi">4</span><span class="p">)</span><span class="o">*</span><span class="n">ellec</span><span class="p">(</span><span class="n">k</span><span class="o">**</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">))</span><span class="o">-</span><span class="p">(</span><span class="mi">3</span><span class="o">*</span><span class="n">q</span><span class="o">/</span><span class="n">a</span><span class="p">)</span><span class="o">*</span><span class="n">ellpic_bulirsch</span><span class="p">(</span><span class="nb">abs</span><span class="p">((</span><span class="n">a</span><span class="o">-</span><span class="n">b</span><span class="p">)</span><span class="o">/</span><span class="n">a</span><span class="p">),</span> <span class="n">k</span><span class="o">**</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">)))</span></div>
+
+<div class="viewcode-block" id="calculate_lambda_3"><a class="viewcode-back" href="../../../imt-lightcurve.html#imt_lightcurve.help_functions.simulation_helper.calculate_lambda_3">[docs]</a><span class="k">def</span> <span class="nf">calculate_lambda_3</span><span class="p">(</span><span class="n">p</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+    <span class="k">return</span> <span class="p">(</span><span class="mi">1</span><span class="o">/</span><span class="mi">3</span><span class="p">)</span><span class="o">+</span><span class="p">((</span><span class="mi">16</span><span class="o">*</span><span class="n">p</span><span class="p">)</span><span class="o">/</span><span class="p">(</span><span class="mi">9</span><span class="o">*</span><span class="n">pi</span><span class="p">))</span><span class="o">*</span><span class="p">(</span><span class="mi">2</span><span class="o">*</span><span class="n">p</span><span class="o">**</span><span class="mi">2</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span><span class="o">*</span><span class="n">ellec</span><span class="p">(</span><span class="mi">1</span><span class="o">/</span><span class="p">(</span><span class="mi">2</span><span class="o">*</span><span class="n">p</span><span class="p">))</span><span class="o">-</span><span class="p">(((</span><span class="mi">1</span><span class="o">-</span><span class="mi">4</span><span class="o">*</span><span class="n">p</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span><span class="o">*</span><span class="p">(</span><span class="mi">3</span><span class="o">-</span><span class="mi">8</span><span class="o">*</span><span class="n">p</span><span class="o">**</span><span class="mi">2</span><span class="p">))</span><span class="o">/</span><span class="p">(</span><span class="mi">9</span><span class="o">*</span><span class="n">pi</span><span class="o">*</span><span class="n">p</span><span class="p">)</span><span class="o">*</span><span class="n">ellk</span><span class="p">(</span><span class="mi">1</span><span class="o">/</span><span class="p">(</span><span class="mi">2</span><span class="o">*</span><span class="n">p</span><span class="p">)))</span></div>
+
+<div class="viewcode-block" id="calculate_lambda_4"><a class="viewcode-back" href="../../../imt-lightcurve.html#imt_lightcurve.help_functions.simulation_helper.calculate_lambda_4">[docs]</a><span class="k">def</span> <span class="nf">calculate_lambda_4</span><span class="p">(</span><span class="n">p</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+    <span class="k">return</span> <span class="p">(</span><span class="mi">1</span><span class="o">/</span><span class="mi">3</span><span class="p">)</span><span class="o">+</span><span class="p">(</span><span class="mi">2</span><span class="o">/</span><span class="p">(</span><span class="mi">9</span><span class="o">*</span><span class="n">pi</span><span class="p">))</span><span class="o">*</span><span class="p">(</span><span class="mi">4</span><span class="o">*</span><span class="p">(</span><span class="mi">2</span><span class="o">*</span><span class="n">p</span><span class="o">**</span><span class="mi">2</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span><span class="o">*</span><span class="n">ellec</span><span class="p">(</span><span class="mi">2</span><span class="o">*</span><span class="n">p</span><span class="p">)</span><span class="o">+</span><span class="p">(</span><span class="mi">1</span><span class="o">-</span><span class="mi">4</span><span class="o">*</span><span class="n">p</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span><span class="o">*</span><span class="n">ellk</span><span class="p">(</span><span class="mi">2</span><span class="o">*</span><span class="n">p</span><span class="p">))</span></div>
+
+<div class="viewcode-block" id="calculate_lambda_5"><a class="viewcode-back" href="../../../imt-lightcurve.html#imt_lightcurve.help_functions.simulation_helper.calculate_lambda_5">[docs]</a><span class="k">def</span> <span class="nf">calculate_lambda_5</span><span class="p">(</span><span class="n">p</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">p</span> <span class="o">&lt;=</span> <span class="mf">0.5</span><span class="p">):</span>
+        <span class="k">return</span> <span class="p">(</span><span class="mi">2</span><span class="o">*</span><span class="p">(</span><span class="mi">3</span><span class="o">*</span><span class="n">pi</span><span class="p">))</span><span class="o">*</span><span class="n">acos</span><span class="p">(</span><span class="mi">1</span><span class="o">-</span><span class="mi">2</span><span class="o">*</span><span class="n">p</span><span class="p">)</span><span class="o">-</span><span class="p">(</span><span class="mi">4</span><span class="o">/</span><span class="p">(</span><span class="mi">9</span><span class="o">*</span><span class="n">pi</span><span class="p">))</span><span class="o">*</span><span class="p">(</span><span class="mi">3</span><span class="o">+</span><span class="mi">2</span><span class="o">*</span><span class="n">p</span><span class="o">-</span><span class="mi">8</span><span class="o">*</span><span class="n">p</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span><span class="o">*</span><span class="n">sqrt</span><span class="p">(</span><span class="n">p</span><span class="o">*</span><span class="p">(</span><span class="mi">1</span><span class="o">-</span><span class="n">p</span><span class="p">))</span>
+    <span class="k">elif</span> <span class="p">(</span><span class="n">p</span> <span class="o">&gt;</span> <span class="mf">0.5</span><span class="p">):</span>
+        <span class="k">return</span> <span class="p">(</span><span class="mi">2</span><span class="o">*</span><span class="p">(</span><span class="mi">3</span><span class="o">*</span><span class="n">pi</span><span class="p">))</span><span class="o">*</span><span class="n">acos</span><span class="p">(</span><span class="mi">1</span><span class="o">-</span><span class="mi">2</span><span class="o">*</span><span class="n">p</span><span class="p">)</span><span class="o">-</span><span class="p">(</span><span class="mi">4</span><span class="o">/</span><span class="p">(</span><span class="mi">9</span><span class="o">*</span><span class="n">pi</span><span class="p">))</span><span class="o">*</span><span class="p">(</span><span class="mi">3</span><span class="o">+</span><span class="mi">2</span><span class="o">*</span><span class="n">p</span><span class="o">-</span><span class="mi">8</span><span class="o">*</span><span class="n">p</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span><span class="o">*</span><span class="n">sqrt</span><span class="p">(</span><span class="n">p</span><span class="o">*</span><span class="p">(</span><span class="mi">1</span><span class="o">-</span><span class="n">p</span><span class="p">))</span><span class="o">-</span><span class="p">(</span><span class="mi">2</span><span class="o">/</span><span class="mi">3</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="calculate_lambda_6"><a class="viewcode-back" href="../../../imt-lightcurve.html#imt_lightcurve.help_functions.simulation_helper.calculate_lambda_6">[docs]</a><span class="k">def</span> <span class="nf">calculate_lambda_6</span><span class="p">(</span><span class="n">p</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+    <span class="k">return</span> <span class="o">-</span><span class="p">(</span><span class="mi">2</span><span class="o">/</span><span class="mi">3</span><span class="p">)</span><span class="o">*</span><span class="p">(</span><span class="mi">1</span><span class="o">-</span><span class="n">p</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span><span class="o">**</span><span class="p">(</span><span class="mi">3</span><span class="o">/</span><span class="mi">2</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="calculate_eta_2"><a class="viewcode-back" href="../../../imt-lightcurve.html#imt_lightcurve.help_functions.simulation_helper.calculate_eta_2">[docs]</a><span class="k">def</span> <span class="nf">calculate_eta_2</span><span class="p">(</span><span class="n">p</span><span class="p">,</span> <span class="n">w</span><span class="p">,</span> <span class="n">z</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+    <span class="k">return</span> <span class="p">((</span><span class="n">p</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span><span class="o">/</span><span class="mi">2</span><span class="p">)</span><span class="o">*</span><span class="p">(</span><span class="n">p</span><span class="o">**</span><span class="mi">2</span><span class="o">+</span><span class="mi">2</span><span class="o">*</span><span class="n">z</span><span class="p">[</span><span class="n">w</span><span class="p">]</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="calculate_eta_1"><a class="viewcode-back" href="../../../imt-lightcurve.html#imt_lightcurve.help_functions.simulation_helper.calculate_eta_1">[docs]</a><span class="k">def</span> <span class="nf">calculate_eta_1</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">,</span> <span class="n">k0</span><span class="p">,</span> <span class="n">k1</span><span class="p">,</span> <span class="n">p</span><span class="p">,</span> <span class="n">w</span><span class="p">,</span> <span class="n">z</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+    <span class="k">return</span> <span class="p">(</span><span class="mi">2</span><span class="o">*</span><span class="n">pi</span><span class="p">)</span><span class="o">**</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span><span class="o">*</span><span class="p">(</span><span class="n">k1</span><span class="o">+</span><span class="mi">2</span><span class="o">*</span><span class="n">calculate_eta_2</span><span class="p">(</span><span class="n">p</span><span class="p">,</span> <span class="n">w</span><span class="p">,</span> <span class="n">z</span><span class="p">)</span><span class="o">*</span><span class="n">k0</span><span class="o">-</span><span class="mf">0.25</span><span class="o">*</span><span class="p">(</span><span class="mi">1</span><span class="o">+</span><span class="mi">5</span><span class="o">*</span><span class="n">p</span><span class="o">**</span><span class="mi">2</span><span class="o">+</span><span class="n">z</span><span class="p">[</span><span class="n">w</span><span class="p">]</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span><span class="o">*</span><span class="n">sqrt</span><span class="p">((</span><span class="mi">1</span><span class="o">-</span><span class="n">a</span><span class="p">)</span><span class="o">*</span><span class="p">(</span><span class="n">b</span><span class="o">-</span><span class="mi">1</span><span class="p">)))</span></div>
+
+<div class="viewcode-block" id="calculate_flux"><a class="viewcode-back" href="../../../imt-lightcurve.html#imt_lightcurve.help_functions.simulation_helper.calculate_flux">[docs]</a><span class="k">def</span> <span class="nf">calculate_flux</span><span class="p">(</span><span class="n">c2</span><span class="p">,</span> <span class="n">c4</span><span class="p">,</span> <span class="n">Omega</span><span class="p">,</span> <span class="n">lambda_e</span><span class="p">,</span> <span class="n">lambda_d</span><span class="p">,</span> <span class="n">eta_d</span><span class="p">,</span> <span class="n">p</span><span class="p">,</span> <span class="n">w</span><span class="p">,</span> <span class="n">z</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">p</span> <span class="o">&lt;=</span> <span class="n">z</span><span class="p">[</span><span class="n">w</span><span class="p">]):</span>
+        <span class="k">return</span> <span class="mi">1</span><span class="o">-</span><span class="p">(</span><span class="mi">4</span><span class="o">*</span><span class="n">Omega</span><span class="p">)</span><span class="o">**</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span><span class="o">*</span><span class="p">((</span><span class="mi">1</span><span class="o">-</span><span class="n">c2</span><span class="p">)</span><span class="o">*</span><span class="n">lambda_e</span><span class="o">+</span><span class="n">c2</span><span class="o">*</span><span class="p">(</span><span class="n">lambda_d</span><span class="o">-</span><span class="n">c4</span><span class="o">*</span><span class="n">eta_d</span><span class="p">))</span>
+
+    <span class="k">if</span> <span class="p">(</span><span class="n">p</span> <span class="o">&gt;</span> <span class="n">z</span><span class="p">[</span><span class="n">w</span><span class="p">]):</span>
+        <span class="k">return</span> <span class="mi">1</span><span class="o">-</span><span class="p">(</span><span class="mi">4</span><span class="o">*</span><span class="n">Omega</span><span class="p">)</span><span class="o">**</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span><span class="o">*</span><span class="p">((</span><span class="mi">1</span><span class="o">-</span><span class="n">c2</span><span class="p">)</span><span class="o">*</span><span class="n">lambda_e</span><span class="o">+</span><span class="n">c2</span><span class="o">*</span><span class="p">(</span><span class="n">lambda_d</span><span class="o">+</span><span class="p">(</span><span class="mi">2</span><span class="o">/</span><span class="mi">3</span><span class="p">)</span><span class="o">-</span><span class="n">c4</span><span class="o">*</span><span class="n">eta_d</span><span class="p">))</span></div>
+</pre></div>
+
+              </div>
+              
+              
+              <div class='prev-next-bottom'>
+                
+
+              </div>
+              
+          </main>
+          
+
+      </div>
+    </div>
+  
+  <script src="../../../_static/js/index.1c5a1a01449ed65a7b51.js"></script>
+
+  <footer class="footer mt-5 mt-md-0">
+  <div class="container">
+    
+    <div class="footer-item">
+      <p class="copyright">
+    &copy; Copyright 2021, Guilherme Samuel.<br/>
+</p>
+    </div>
+    
+    <div class="footer-item">
+      <p class="sphinx-version">
+Created using <a href="http://sphinx-doc.org/">Sphinx</a> 4.2.0.<br/>
+</p>
+    </div>
+    
+  </div>
+</footer>
+  </body>
+</html>

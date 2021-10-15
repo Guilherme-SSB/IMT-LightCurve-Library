@@ -88,10 +88,10 @@ class Simulate():
         #       round(self.__calculate_uncertains('adivR', 0.05), 8))
         # print('-> chi2 =', self.chi2_best, end='\n\n')
 
-        uncertanties = {'b_impact_uncertanties': self.__calculate_uncertains('b_impact', 0.05),
-                        'p_uncertanties': self.__calculate_uncertains('p', 0.05),
-                        'period_uncertanties': self.__calculate_uncertains('period', 0.05),
-                        'adivR_uncertanties': self.__calculate_uncertains('adivR', 0.05)}
+        uncertanties = {'b_impact_uncertanties': self.__calculate_uncertains('b_impact', 1),
+                        'p_uncertanties': self.__calculate_uncertains('p', 1),
+                        'period_uncertanties': self.__calculate_uncertains('period', 1),
+                        'adivR_uncertanties': self.__calculate_uncertains('adivR', 1)}
                         
 
         final_results = pd.DataFrame(
@@ -402,13 +402,15 @@ class Simulate():
             if (self.simulation_table['chi2'].loc[i] < (min_error + tolarance)):
                 data.append(parameter_values.loc[i])
         data = np.array(data)
+        
+        return np.std(data)
 
-        # x_bar = np.mean(data)
-        sigma = np.std(data)
-        n = len(data)
-        z = 1.96  # -> 95%
+        # # x_bar = np.mean(data)
+        # sigma = np.std(data)
+        # n = len(data)
+        # z = 1.96  # -> 95%
 
-        return (z*sigma)/sqrt(n)
+        # return (z*sigma)/sqrt(n)
 
     def __reset_attributes(self) -> None:
         object.__setattr__(self, 'b_impact_best', None)
