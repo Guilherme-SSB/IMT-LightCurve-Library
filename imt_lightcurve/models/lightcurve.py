@@ -8,7 +8,7 @@ from math import exp, factorial
 import lightkurve as lk
 import numpy as np
 import pandas as pd
-# from control import TransferFunction, evalfr
+from control import TransferFunction, evalfr
 
 from scipy.signal import medfilt
 from tabulate import tabulate  # Fancy compare results
@@ -182,8 +182,8 @@ class LightCurve(BaseLightCurve):
     def fold(self, smooth_curve: bool=False, window: float=0.15, window_filter: int=201, order_filter: int=3):
         raise NotImplementedError('Not implemented yet')
 
+    @staticmethod
     def export_filters_to_csv(
-            self,
             WHERE_TO_SAVE_PATH:str, 
             WHERE_ARE_THE_RESAMPLED_DATASET:str, 
             FILTER_TECHNIQUE:str, 

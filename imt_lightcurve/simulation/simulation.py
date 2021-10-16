@@ -1,5 +1,4 @@
 from dataclasses import dataclass, field
-from re import M
 from tqdm import tqdm
 
 import numpy as np
@@ -10,6 +9,10 @@ from imt_lightcurve.models.lightcurve import (LightCurve, SimulatedPhaseFoldedLi
 
 # Planet coordinate, along the x-axis, as a function of the start's radius
 x_values=[1.5, 1.4, 1.3, 1.2, 1.1, 1.0, 0.9, 0.8, 0.7, 0.6, 0.5, 0.4, 0.3, 0.2, 0.1, 0.0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0, 1.1, 1.2, 1.3, 1.4, 1.5]
+
+# Complete path to the filters directory
+FILTERS_RESULTS_PATH = r'C:\Users\guisa\Google Drive\01 - Iniciação Científica\02 - Datasets\exoplanets_confirmed'
+
 @dataclass(frozen=True)
 class Simulate():
     """
@@ -142,6 +145,11 @@ class Simulate():
         # if results_to_csv: # REFORMULAR
         #     sorted_table.to_csv('final_table.csv', index=False)
 
+    def simulate_values_for_filters(self, filter_technique: str) -> pd.DataFrame:
+        self.__reset_attributes()
+
+
+        pass
 
     def simulate_lightcurve(self, observed_curve: LightCurve, b_impact: float = None, p: float = None, period: float = None, adivR: float = None, x_values: np.ndarray=x_values) -> SimulatedPhaseFoldedLightCurve:
         self.__reset_attributes()
