@@ -9,6 +9,7 @@ import lightkurve as lk
 import numpy as np
 import pandas as pd
 from control import TransferFunction, evalfr
+from scipy.signal import find_peaks, peak_widths
 
 from scipy.signal import medfilt
 from tabulate import tabulate  # Fancy compare results
@@ -179,8 +180,107 @@ class LightCurve(BaseLightCurve):
     def median_filter(self, numNei, numExpansion: int=70):
         return self.__apply_filter(self.time, self.flux, filter_technique='median', numNei=numNei, numExpansion=numExpansion, cutoff_freq=None, order=None)
 
-    def fold(self, smooth_curve: bool=False, window: float=0.15, window_filter: int=201, order_filter: int=3):
-        raise NotImplementedError('Not implemented yet')
+    def fold(self, corot_id: int):
+        P = LightCurve.get_true_value(corot_id, 'Per')
+        time = np.arange(0, len(self.time))
+        normalized_flux = self.flux / np.median(self.flux)
+        normalized_inverted_curve = LightCurve(time=time, flux=-1*normalized_flux)
+        x = normalized_inverted_curve.flux
+
+        # Determine eclipses peaks
+        peaks, _ = find_peaks(x, distance=P*100)
+        peaks = peaks[1:-1]
+        totalEclipses = len(peaks)
+
+        # Determine eclipses widths
+        widths = peak_widths(x, peaks, rel_height=0.5)
+        eclipse_widths_mean = np.mean(widths[0])
+
+        # Summing all eclipses
+        sum_eclipses_flux = 0
+        for numEclipse in range(totalEclipses):
+            cond = (normalized_inverted_curve.time > (peaks[numEclipse]-eclipse_widths_mean/2)) & (normalized_inverted_curve.time < (peaks[numEclipse]+eclipse_widths_mean/2))
+            sum_eclipses_flux += normalized_inverted_curve.flux[cond]
+
+        sum_eclipses_flux *= -1
+
+        # Computing the average eclipse
+        avg_eclipses_flux = sum_eclipses_flux/totalEclipses
+
+        time_fold = np.arange(-len(avg_eclipses_flux)/2, len(avg_eclipses_flux)/2)
+
+        # Return
+        phase_folded_curve = PhaseFoldedLightCurve(time=time_fold, flux=avg_eclipses_flux)
+        error = np.std(avg_eclipses_flux)
+        error_array = [error for i in range(len(avg_eclipses_flux))]
+        phase_folded_curve.flux_error = error_array
+
+        return phase_folded_curve
+
+    def __replace_negative_values(array: np.ndarray) -> np.ndarray:
+        array[array < 0] = 0
+        return array
+
+    def __remove_duplicate_values(array: np.ndarray) -> np.ndarray:
+        return np.array(list(set(array)))
+
+    def __replace_zero_values(array: np.ndarray) -> np.ndarray:
+        return np.where(array==0, array[-1], array)
+
+    @abstractmethod
+    def get_true_value(corot_id: int, parameter: str) -> float:
+        """The keywords to be passed as `parameter: str` are:
+        - 'Per'   -> returns the orbital period
+        - 'Rp/R*' -> returns the radius value of the planet compared to the star
+        - 'a/R*'  -> returns the orbital radius values compared to star radius
+        - 'b'     -> returns the transit impact parameter
+        
+        """
+        if any(complete_table_5['CoRoT'] == corot_id) == False:
+            raise Error(f'Not found CoRoT-ID: {corot_id} at Table 5')
+        else:
+            # return float(complete_table_5[complete_table_5['CoRoT'] == corot_id][parameter].values[0].split('±')[0])
+            return float(complete_table_5[complete_table_5['CoRoT'] == corot_id][parameter].to_numpy()[0])
+
+    @abstractmethod
+    def define_interval_period(period: float) -> np.ndarray:
+        period_values = np.arange(round(period, 2)-0.02, round(period, 2)+0.03, 0.01)
+        period_values = LightCurve.__replace_negative_values(period_values)
+        period_values = LightCurve.__remove_duplicate_values(period_values)
+        period_values = LightCurve.__replace_zero_values(period_values)
+        period_values = np.around(period_values, 4)
+        period_values = sorted(period_values)
+        return np.array(period_values)
+
+    @abstractmethod
+    def define_interval_p(p: float) -> np.ndarray:
+        p_values = np.arange(round(p, 2)-0.02, round(p, 2)+0.03, 0.01)
+        p_values = LightCurve.__replace_negative_values(p_values)
+        p_values = LightCurve.__remove_duplicate_values(p_values)
+        p_values = LightCurve.__replace_zero_values(p_values)
+        p_values = np.around(p_values, 4)
+        p_values = sorted(p_values)
+        return np.array(p_values)
+
+    @abstractmethod 
+    def define_interval_adivR(adivR: float) -> np.ndarray:
+        adivR_values = np.arange(round(adivR, 2)-0.02, round(adivR, 2)+0.03, 0.01)
+        adivR_values = LightCurve.__replace_negative_values(adivR_values)
+        adivR_values = LightCurve.__remove_duplicate_values(adivR_values)
+        adivR_values = LightCurve.__replace_zero_values(adivR_values)
+        adivR_values = np.around(adivR_values, 4)
+        adivR_values = sorted(adivR_values)
+        return np.array(adivR_values)
+
+    @abstractmethod
+    def define_interval_b(b: float) -> np.ndarray:
+        b_values = np.arange(round(b, 2)-0.02, round(b, 2)+0.03, 0.01)
+        b_values = LightCurve.__replace_negative_values(b_values)
+        b_values = LightCurve.__remove_duplicate_values(b_values)
+        b_values = LightCurve.__replace_zero_values(b_values)
+        b_values = np.around(b_values, 4)
+        b_values = sorted(b_values)
+        return np.array(b_values)
 
     @staticmethod
     def export_filters_to_csv(
@@ -328,73 +428,6 @@ class LightCurve(BaseLightCurve):
 
         print(f'\nData from {FILTER_TECHNIQUE} has been saved successfully!')
 
-    def __replace_negative_values(array: np.ndarray) -> np.ndarray:
-        array[array < 0] = 0
-        return array
-
-    def __remove_duplicate_values(array: np.ndarray) -> np.ndarray:
-        return np.array(list(set(array)))
-
-    def __replace_zero_values(array: np.ndarray) -> np.ndarray:
-        return np.where(array==0, array[-1], array)
-
-    @abstractmethod
-    def get_true_value(corot_id: int, parameter: str) -> float:
-        """The keywords to be passed as `parameter: str` are:
-        - 'Per'   -> returns the orbital period
-        - 'Rp/R*' -> returns the radius value of the planet compared to the star
-        - 'a/R*'  -> returns the orbital radius values compared to star radius
-        - 'b'     -> returns the transit impact parameter
-        
-        """
-        if any(complete_table_5['CoRoT'] == corot_id) == False:
-            raise Error(f'Not found CoRoT-ID: {corot_id} at Table 5')
-        else:
-            # return float(complete_table_5[complete_table_5['CoRoT'] == corot_id][parameter].values[0].split('±')[0])
-            return float(complete_table_5[complete_table_5['CoRoT'] == corot_id][parameter].to_numpy()[0])
-
-    @abstractmethod
-    def define_interval_period(period: float) -> np.ndarray:
-        period_values = np.arange(round(period, 2)-0.02, round(period, 2)+0.03, 0.01)
-        period_values = LightCurve.__replace_negative_values(period_values)
-        period_values = LightCurve.__remove_duplicate_values(period_values)
-        period_values = LightCurve.__replace_zero_values(period_values)
-        period_values = np.around(period_values, 4)
-        period_values = sorted(period_values)
-        return np.array(period_values)
-
-    @abstractmethod
-    def define_interval_p(p: float) -> np.ndarray:
-        p_values = np.arange(round(p, 2)-0.02, round(p, 2)+0.03, 0.01)
-        p_values = LightCurve.__replace_negative_values(p_values)
-        p_values = LightCurve.__remove_duplicate_values(p_values)
-        p_values = LightCurve.__replace_zero_values(p_values)
-        p_values = np.around(p_values, 4)
-        p_values = sorted(p_values)
-        return np.array(p_values)
-
-    @abstractmethod 
-    def define_interval_adivR(adivR: float) -> np.ndarray:
-        adivR_values = np.arange(round(adivR, 2)-0.02, round(adivR, 2)+0.03, 0.01)
-        adivR_values = LightCurve.__replace_negative_values(adivR_values)
-        adivR_values = LightCurve.__remove_duplicate_values(adivR_values)
-        adivR_values = LightCurve.__replace_zero_values(adivR_values)
-        adivR_values = np.around(adivR_values, 4)
-        adivR_values = sorted(adivR_values)
-        return np.array(adivR_values)
-
-    @abstractmethod
-    def define_interval_b(b: float) -> np.ndarray:
-        b_values = np.arange(round(b, 2)-0.02, round(b, 2)+0.03, 0.01)
-        b_values = LightCurve.__replace_negative_values(b_values)
-        b_values = LightCurve.__remove_duplicate_values(b_values)
-        b_values = LightCurve.__replace_zero_values(b_values)
-        b_values = np.around(b_values, 4)
-        b_values = sorted(b_values)
-        return np.array(b_values)
-
-   
-
 class FilteredLightCurve(LightCurve):
     # Attributes
     filtered_flux: np.ndarray
@@ -442,8 +475,8 @@ class PhaseFoldedLightCurve(LightCurve):
     def __init__(self, time: np.ndarray, flux: np.ndarray, flux_error: np.ndarray=None) -> None:
         super().__init__(time, flux, flux_error)
 
-    def plot(self):
-        super().plot(title='Folded LightCurve', label='Folded Lightcurve')
+    def plot(self, title: str='Folded LightCurve'):
+        super().plot(title=title, label='Folded Lightcurve')
 
 
 
