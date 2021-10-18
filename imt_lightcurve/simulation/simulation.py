@@ -40,7 +40,7 @@ class Simulate():
     simulation_table: pd.DataFrame = field(default=pd.DataFrame(columns=['b_impact', 'p', 'period', 'adivR', 'chi2']), repr=False)
 
     # Class methods
-    def simulate_values(self, CoRoT_ID: int, observed_curve: LightCurve, b_values: np.ndarray, p_values: np.ndarray, period_values: np.ndarray, adivR_values: np.ndarray, x_values: np.ndarray=x_values, set_best_values=True, results_to_csv=False) -> tuple:
+    def simulate_values(self, CoRoT_ID: int, observed_curve: LightCurve, b_values: np.ndarray, p_values: np.ndarray, period_values: np.ndarray, adivR_values: np.ndarray, x_values: np.ndarray=x_values, set_best_values=True, results_to_csv=False, filter_technique: str=None, filter_order: str=None, filter_cutoff: str=None, filter_numNei: str=None) -> pd.DataFrame:
         self.__reset_attributes()
         print('Starting simulation...')
         list_b_values = []
@@ -49,8 +49,7 @@ class Simulate():
         list_adivR_values = []
         list_chi2_values = []
 
-        total = len(b_values) * len(p_values) * \
-            len(period_values) * len(adivR_values)
+        total = len(b_values) * len(p_values) * len(period_values) * len(adivR_values)
         with tqdm(range(total), colour='blue', desc='Simulating') as pbar:
             for b_impact in b_values:
                 for p in p_values:
@@ -80,17 +79,6 @@ class Simulate():
             object.__setattr__(self, 'adivR_best', sorted_table.loc[sorted_table.index[0]][3])
             object.__setattr__(self, 'chi2_best', sorted_table.loc[sorted_table.index[0]][4])
         
-        # print("\nBest parameters computed are:")
-        # print('-> b_impact =', self.b_impact_best, '±',
-        #       round(self.__calculate_uncertains('b_impact', 0.05), 8))
-        # print('-> p =', self.p_best, '±',
-        #       round(self.__calculate_uncertains('p', 0.05), 8))
-        # print('-> period =', self.period_best, '±',
-        #       round(self.__calculate_uncertains('period', 0.05), 8))
-        # print('-> adivR =', self.adivR_best, '±',
-        #       round(self.__calculate_uncertains('adivR', 0.05), 8))
-        # print('-> chi2 =', self.chi2_best, end='\n\n')
-
         uncertanties = {'b_impact_uncertanties': self.__calculate_uncertains('b_impact', 1),
                         'p_uncertanties': self.__calculate_uncertains('p', 1),
                         'period_uncertanties': self.__calculate_uncertains('period', 1),
@@ -98,19 +86,6 @@ class Simulate():
                         
 
         final_results = pd.DataFrame(
-            # dict(
-            #     CoRoT_ID=[], 
-            #     b_impact=[], 
-            #     b_impact_uncertanties=[], 
-            #     p=[], 
-            #     p_uncertanties=[], 
-            #     period=[], 
-            #     period_uncertanties=[], 
-            #     adivR=[], 
-            #     adivR_uncertanties=[], 
-            #     chi2=[]
-            #     ), 
-            #     dtype=float)
             dict(
                 CoRoT_ID = [], 
                 period   = [],
@@ -121,7 +96,11 @@ class Simulate():
                 e_adivR  = [],
                 b        = [],
                 e_b      = [],
-                chi2     = []
+                chi2     = [],
+                filter_technique = [],
+                filter_order     = [],
+                filter_cutoff    = [],
+                filter_numNei    = []
             ), 
                 dtype=float)
         
@@ -136,7 +115,11 @@ class Simulate():
                 e_adivR  = uncertanties['adivR_uncertanties'],
                 b        = self.b_impact_best,
                 e_b      = uncertanties['b_impact_uncertanties'],               
-                chi2     = self.chi2_best
+                chi2     = self.chi2_best,
+                filter_technique = filter_technique,
+                filter_order     = filter_order,
+                filter_cutoff    = filter_cutoff,
+                filter_numNei    = filter_numNei
             ),
             ignore_index=True)
         final_results.set_index('CoRoT_ID', inplace=True)
@@ -145,9 +128,8 @@ class Simulate():
         # if results_to_csv: # REFORMULAR
         #     sorted_table.to_csv('final_table.csv', index=False)
 
-    def simulate_values_for_filters(self, filter_technique: str) -> pd.DataFrame:
+    def simulate_values_for_filters(self, filter_technique: str, filter_order: str=None, filter_cutoff: str=None, filter_numNei: str=None) -> pd.DataFrame:
         self.__reset_attributes()
-
 
         pass
 
