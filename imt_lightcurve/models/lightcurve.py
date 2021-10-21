@@ -226,35 +226,19 @@ class LightCurve(BaseLightCurve):
         return phase_folded_curve
 
     def __load_fold_infos(self, corot_id):
+
         if corot_id == '100725706':
-            eclipses_position = [1067, 2469, 3901, 5302, 6704, 8106, 9508, 10890, 12290, 13700]
+            eclipses_position = [1072, 2471, 3871, 5275, 6679, 8081, 9482, 10888, 12291, 13693]
             eclipses_width = 13
 
         if corot_id == '101086161':
-            eclipses_position = [244, 899, 1554, 2217, 2871, 3532, 4188, 4848, 5505, 6161, 6820,
-                                 7480, 8134, 8792, 9455, 10109, 10771, 11428, 12088, 12745, 13402,
-                                 14061, 14719]
+            eclipses_position = [244, 899, 1554, 2217, 2871, 3532, 4188, 4848, 5505, 6161, 6820, 7480, 8134, 8792, 9455, 10109, 10771, 11428, 12088, 12745, 13402, 14061, 14719]
             eclipses_width = 13
-
-        if corot_id == '101206560':
-            pass
 
         if corot_id == '101368192':
             pass
 
         if corot_id == '102671819':
-            pass
-
-        if corot_id == '102671819':
-            pass
-
-        if corot_id == '102708694':
-            pass
-
-        if corot_id == '102708694':
-            pass
-
-        if corot_id == '102725122':
             pass
 
         if corot_id == '102725122':
@@ -267,9 +251,6 @@ class LightCurve(BaseLightCurve):
             pass
 
         if corot_id == '102912369':
-            pass
-
-        if corot_id == '105118236':
             pass
 
         if corot_id == '105209106':
@@ -299,12 +280,6 @@ class LightCurve(BaseLightCurve):
         if corot_id == '110864907':
             pass
 
-        if corot_id == '221686194':
-            pass
-
-        if corot_id == '300001097':
-            pass
-
         if corot_id == '310247220':
             pass
 
@@ -328,7 +303,6 @@ class LightCurve(BaseLightCurve):
 
         if corot_id == '652180991':
             pass
-
         else:
             raise NameError(
                 f'{corot_id} is not a valid CoRoT-ID. Please check it ')
