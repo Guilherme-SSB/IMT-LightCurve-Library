@@ -1,25 +1,30 @@
 #%% Loading folded curve
 
 import numpy as np
+import pandas as pd
 from imt_lightcurve.models.lightcurve import LightCurve
-from imt_lightcurve.simulation.simulation import FILTERS_RESULTS_PATH, Simulate
+from imt_lightcurve.simulation.simulation import  Simulate
 
 # Chosen a LightCurve to simulation process
-LIGHTCURVE = 'RESAMPLED_0101206560_20070516T060226'
+CURVE_ID = '100725706'
 
+# Importing lightcurve data from github
+data = pd.read_csv('https://raw.githubusercontent.com/Guilherme-SSB/IC-CoRoT_Kepler/main/resampled_files/' + CURVE_ID + '.csv')
+time = data.DATE.to_numpy()
+flux = data.WHITEFLUX.to_numpy()
 
-time = np.loadtxt(r"C:\Users\guisa\Desktop\time_folded.txt")
-flux = np.loadtxt(r"C:\Users\guisa\Desktop\flux_folded.txt")
-folded_curve = LightCurve(time, flux)
-error = np.std(folded_curve.flux)
-error_array = [error for i in range(len(folded_curve.flux))]
-folded_curve.flux_error = error_array
+# Create the LightCurve object
+curve = LightCurve(time=time, flux=flux)
+curve.plot()
 
-folded_curve.plot()
+# Folded curve
+folded_curve = curve.fold(CURVE_ID)
+# folded_curve.plot()
 
 ################################################################
+#%%
 # Real values
-curve_id = int(LIGHTCURVE.split('_')[1][1:])
+curve_id = int(CURVE_ID)
 
 ## Orbital period values to be considered
 period_real = LightCurve.get_true_value(curve_id, 'Per')
