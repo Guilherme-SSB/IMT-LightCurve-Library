@@ -1,0 +1,11 @@
+Metadata-Version: 1.2
+Name: imt-lightcurve
+Version: 1.2
+Summary: Library created to manipulate LightCurves
+Home-page: UNKNOWN
+Author: Guilherme Samuel
+Author-email: gui.samuel10@gmail.com
+License: MIT
+Description: UNKNOWN
+Platform: UNKNOWN
+Requires-Python: >=3.7.11
