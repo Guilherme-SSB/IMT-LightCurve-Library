@@ -19,8 +19,8 @@ def line_plot(
         y_axis_type='auto', 
         reverse=False):
 
-    delta_x = x_data[1]-x_data[0]
-    delta_y = y_data[1]-y_data[0]
+    # delta_x = x_data[1]-x_data[0]
+    # delta_y = y_data[1]-y_data[0]
 
 
     p = figure(title=title,

@@ -5,10 +5,10 @@ from abc import abstractmethod
 from shutil import Error
 import os
 from math import exp, factorial
-import lightkurve as lk
+# import lightkurve as lk
 import numpy as np
 import pandas as pd
-from control import TransferFunction, evalfr
+# from control import TransferFunction, evalfr
 from scipy.signal import find_peaks, peak_widths
 
 from scipy.signal import medfilt
@@ -229,6 +229,7 @@ class LightCurve(BaseLightCurve):
         """codigo novo"""
         # Ajusts time axis
         time = np.arange(0, len(self.flux))
+        self.flux = self.flux/np.median(self.flux)
 
         # Based on corot_id, load the positions and the widths of eclipses
         positions, width = self.__load_fold_infos(corot_id=corot_id)
@@ -239,12 +240,12 @@ class LightCurve(BaseLightCurve):
         # Summing all eclipses
         sum_eclipses_flux = 0
         for eclipse in range(totalEclipses):
-            cond = (time > (positions[eclipse]-width/2)) & (time < (positions[eclipse]+width/2))
-            sum_eclipses_flux += self.flux[cond]
+            cond = (time > (positions[eclipse]-(width))) & (time < (positions[eclipse]+(width)))
+        sum_eclipses_flux += self.flux[cond]
 
         # Computing the average eclipse
         avg_eclipses_flux = sum_eclipses_flux/totalEclipses
-
+    
         # Return
         time_fold = np.arange(-len(avg_eclipses_flux)/2, +len(avg_eclipses_flux)/2)
 
@@ -253,7 +254,7 @@ class LightCurve(BaseLightCurve):
         error_array = [error for i in range(len(avg_eclipses_flux))]
         folded_curve.flux_error = error_array
 
-        return folded_curve
+        return folded_curve, positions, width
         
     def __load_fold_infos(self, corot_id: str):
         if corot_id == '100725706':

@@ -7,6 +7,8 @@ import pandas as pd
 import scipy.signal as ssg
 from astropy.io import fits
 
+from imt_lightcurve.models.lightcurve import LightCurve
+
 
 class DATAHelper():
     # https://www.geeksforgeeks.org/class-method-vs-static-method-python/
@@ -159,4 +161,20 @@ class DATAHelper():
     @staticmethod
     def compute_periodogram_feature(CSV_PATH: str) -> pd.DataFrame:
         pass
+
+    @staticmethod
+    def compute_folded_curve(INPUT_CURVES_PATH: str, OUTPUT_FOLDED_CURVES_PATH: str):
+        for root_dir_path, sub_dirs, files in os.walk(INPUT_CURVES_PATH):
+            for j in range(0, len(files)):
+                if files[j].endswith('.csv'):
+                    path = root_dir_path + "/" + files[j]
+                    curve_data = pd.read_csv(path)
+                    curve = LightCurve(curve_data.DATE, curve_data.WHITEFLUX)
+                    curve_id = files[j].split('.')[0]
+                    folded_curve, _, _ = curve.fold(curve_id)
+                    folded_curve.plot(title=f'Folded {curve_id} object')
+                    
+                
+
+                    
         
