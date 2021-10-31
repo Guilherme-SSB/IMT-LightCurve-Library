@@ -387,7 +387,7 @@ class LightCurve(BaseLightCurve):
                 start=numNei_range[0], stop=numNei_range[1]+numNei_range[2], step=numNei_range[2])
             total *= len(neighboors)
 
-        with tqdm(range(total), colour='blue', desc='Saving') as pbar:
+        with tqdm(range(total), colour='blue', desc=f'Saving data for {FILTER_TECHNIQUE}') as pbar:
             for root_dir_path, sub_dirs, files in os.walk(DATASET_PATH):
                 for j in range(0, len(files)):
                     if files[j].endswith('.csv'):
@@ -525,7 +525,7 @@ class LightCurve(BaseLightCurve):
                                 filtered_df.to_csv(file, index=False)
                                 pbar.update(1)
 
-        print(f'\nData from {FILTER_TECHNIQUE} has been saved successfully!')
+        print(f'Data from {FILTER_TECHNIQUE} has been saved successfully!\n\n')
 
 
 class FilteredLightCurve(LightCurve):

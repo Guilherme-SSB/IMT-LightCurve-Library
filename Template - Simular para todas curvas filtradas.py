@@ -50,7 +50,7 @@ with tqdm(range(total), colour='blue', desc='Simulating') as pbar:
 
             # Reading a curve
             data = pd.read_csv(CURVE_PATH)
-            curve = LightCurve(data.TIME, data.FOLD_FLUX)
+            curve = LightCurve(time=data.TIME, flux=data.FOLD_FLUX, flux_error=data.ERROR)
             # curve.plot(title=title)
 
             # Extracting the "real" parameters
@@ -95,16 +95,29 @@ with tqdm(range(total), colour='blue', desc='Simulating') as pbar:
                 final_table = final_table.append(results)
                 pbar.update(1)
             except:
-                # final_table.to_csv('FINAL_TABLE.csv', index=False)
+                final_table.to_csv('FINAL_TABLE.csv', index=False)
                 raise Exception('Something went wrong! Saving results and closing the script')
 
-            # pbar.update(1)
-
-        
             
 final_table.head()
                 
-# final_table.to_csv('FINAL_TABLE.csv', index=False)
+final_table.to_csv('FINAL_TABLE.csv', index=True)
+
+
+
+# %%
+
+import pandas as pd
+
+results_final = pd.read_csv('FINAL_TABLE.csv', index_col='CoRoT_ID')
+
+# results_final.sort_values(by='e_period').head()                                       # butterworth, n1, f01 (e_period = 0.0141421356237306)
+# results_final.sort_values(by='e_p').head()                                            # butterworth, n3, f06 (e_p = 0)  
+# results_final.sort_values(by='e_p')[results_final.sort_values(by='e_p')['e_p'] != 0]  # butterworth, n2, f06 (e_p = 3.469446951953614e-18) 
+# results_final.sort_values(by='e_adivR').head()                                        # ideal, f09 (e_adivR = 0.0141421356237301)
+# results_final.sort_values(by='e_b').head()                                            # ideal, f05 (e_b = 0)
+# results_final.sort_values(by='e_b')[results_final.sort_values(by='e_b')['e_b'] != 0]  # ideal, f06 (e_b = 1.1102230246251563e-16)
+
 
 
 
