@@ -185,49 +185,7 @@ class LightCurve(BaseLightCurve):
         return self.__apply_filter(self.time, self.flux, filter_technique='median', numNei=numNei, numExpansion=numExpansion, cutoff_freq=None, order=None)
 
     def fold(self, corot_id: str):
-        """codigo velho"""
-        # P = LightCurve.get_true_value(corot_id, 'Per')
-        # time = np.arange(0, len(self.time))
-        # normalized_flux = self.flux / np.median(self.flux)
-        # normalized_inverted_curve = LightCurve(
-        #     time=time, flux=-1*normalized_flux)
-        # x = normalized_inverted_curve.flux
-
-        # # Determine eclipses peaks
-        # peaks, _ = find_peaks(x, distance=P*100)
-        # peaks = peaks[1:-1]
-        # totalEclipses = len(peaks)
-
-        # # Determine eclipses widths
-        # widths = peak_widths(x, peaks, rel_height=0.5)
-        # eclipse_widths_mean = np.mean(widths[0])
-
-        # Summing all eclipses
-        # sum_eclipses_flux = 0
-        # for numEclipse in range(totalEclipses):
-        #     cond = (normalized_inverted_curve.time > (peaks[numEclipse]-eclipse_widths_mean/2)) & (
-        #         normalized_inverted_curve.time < (peaks[numEclipse]+eclipse_widths_mean/2))
-        #     sum_eclipses_flux += normalized_inverted_curve.flux[cond]
-
-        # sum_eclipses_flux *= -1
-
-        # # Computing the average eclipse
-        # avg_eclipses_flux = sum_eclipses_flux/totalEclipses
-
-        # time_fold = np.arange(-len(avg_eclipses_flux)/2,
-        #                       len(avg_eclipses_flux)/2)
-
-        # # Return
-        # phase_folded_curve = PhaseFoldedLightCurve(
-        #     time=time_fold, flux=avg_eclipses_flux)
-        # error = np.std(avg_eclipses_flux)
-        # error_array = [error for i in range(len(avg_eclipses_flux))]
-        # phase_folded_curve.flux_error = error_array
-
-        # return phase_folded_curve
-
-        """codigo novo"""
-        # Ajusts time axis
+        # Ajusts time and flux axis
         time = np.arange(0, len(self.flux))
         self.flux = self.flux/np.median(self.flux)
 
@@ -245,6 +203,7 @@ class LightCurve(BaseLightCurve):
 
         # Computing the average eclipse
         avg_eclipses_flux = sum_eclipses_flux/totalEclipses
+        avg_eclipses_flux = avg_eclipses_flux/np.median(avg_eclipses_flux)
     
         # Return
         time_fold = np.arange(-len(avg_eclipses_flux)/2, +len(avg_eclipses_flux)/2)
@@ -254,7 +213,7 @@ class LightCurve(BaseLightCurve):
         error_array = [error for i in range(len(avg_eclipses_flux))]
         folded_curve.flux_error = error_array
 
-        return folded_curve, positions, width
+        return folded_curve
         
     def __load_fold_infos(self, corot_id: str):
         if corot_id == '100725706':
@@ -270,7 +229,7 @@ class LightCurve(BaseLightCurve):
             eclipses_width = 17
 
         if corot_id == '102671819':
-            eclipses_position = [135, 461, 783, 1106, 1431, 1753, 2078, 2401, 2729, 3049, 3371, 3694, 4019, 4345, 4669, 4989, 5316, 5636, 5963, 6285, 6611, 6933, 7256, 7581, 7906, 8226, 8553, 8875, 9199, 9524, 9846, 10171, 10493, 10819, 11145, 11465, 11790, 12113, 12438, 12763, 13088, 13409, 13735, 14059, 14385, 14757, 15031]
+            eclipses_position = [136, 460, 784, 1107, 1433, 1755, 2079, 2402, 2727, 3051, 3372, 3695, 4019, 4344, 4667, 4990, 5314, 5638, 5962, 6286, 6610, 6934, 7258, 7582, 7906, 8228, 8552, 8877, 9201, 9525, 9848, 10171, 10496, 10820, 11144, 11467, 11791, 12114, 12439, 12762, 13085, 13410, 13733, 14057, 14382]
             eclipses_width = 14
 
         if corot_id == '102764809':
@@ -286,19 +245,19 @@ class LightCurve(BaseLightCurve):
             eclipses_width = 50
 
         if corot_id == '105209106':
-            eclipses_position = [112, 558, 996, 1425, 1863, 2300, 2738, 3168, 3615, 4037, 4481, 4918, 5359, 5795, 6224, 6658, 7094, 7530, 7975, 8408, 8846, 9289, 9714, 10154, 10590, 11029, 11464, 11901, 12770, 13209, 13645, 14086, 14517, 14965]
+            eclipses_position = [120, 558, 990, 1432, 1869, 2300, 2737, 3175, 3611, 4042, 4482, 4919, 5353, 5790, 6665, 7102, 7536, 7973, 8409, 8848, 9283, 9719, 10155, 10549, 11030, 11465, 11902]
             eclipses_width = 20
 
         if corot_id == '105793995':
-            eclipses_position = [390, 896, 1402, 1908, 2405, 2906, 3413, 3911, 4415, 4920, 5412, 5917, 6421, 6926, 7433, 7939, 8444, 8952, 9457, 9964, 10466, 10973, 11480, 11985, 12492, 13081, 14010, 14516, 15022]
+            eclipses_position = [391, 1907, 2403, 2909, 3414, 3910, 4416, 4921, 5412, 5917, 6422, 6927, 7433, 7938, 8445, 8951, 9457, 9963, 10467, 10973, 11479, 11986, 12491, 13080, 13503, 14009, 14515, 15021]
             eclipses_width = 8
             
-        if corot_id == '105819653':
-            eclipses_position = [133, 1054, 1845, 2684, 3701, 4709, 5705, 6726, 7736, 8990, 9774, 10785, 11801, 12814, 13836, 14840]
+        if corot_id == '105819653': #TODO Remove ?
+            eclipses_position = [2689, 3700, 4716, 5709, 6724, 7738, 8755, 9771, 10786, 11798, 12816, 14847]
             eclipses_width = 20
         
         if corot_id == '105833549':
-            eclipses_position = [131, 443, 753, 1066, 1377, 1686, 1997, 2301, 2615, 2924, 3237, 3546, 3849, 4160, 4469, 4783, 5095, 5389, 5702, 6013, 6324, 6635, 6948, 7260, 7569, 7880, 8194, 8505, 8816, 9127, 9440, 9751, 10065, 10375, 10686, 10999, 11312, 11623, 11935, 12245, 12555, 12868, 13181, 13489, 13802, 14115, 14427, 14737, 15049]
+            eclipses_position = [131, 442, 753, 1065, 1377, 1688, 1999, 2302, 2615, 2926, 3237, 3548, 3849, 4159, 4471, 4783, 5095, 5390, 5701, 6013, 6325, 6635, 6947, 7259, 7570, 7882, 8194, 8506, 8817, 9128, 9440, 9752, 10063, 10375, 10687, 10998, 11309, 11621, 11934, 12245, 12556, 12869, 13179, 13491, 13803, 14115, 14427, 14738]
             eclipses_width = 12
         
         if corot_id == '105891283':
@@ -314,7 +273,7 @@ class LightCurve(BaseLightCurve):
             eclipses_width = 17
         
         if corot_id == '315198039':
-            eclipses_position = [507, 2933, 5363, 7741, 10174, 12570, 15045]
+            eclipses_position = [506, 2930, 5345, 7756, 10179, 12592]
             eclipses_width = 122
 
         if corot_id == '315211361':

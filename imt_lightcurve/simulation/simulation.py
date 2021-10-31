@@ -42,28 +42,26 @@ class Simulate():
     # Class methods
     def simulate_values(self, CoRoT_ID: int, observed_curve: LightCurve, b_values: np.ndarray, p_values: np.ndarray, period_values: np.ndarray, adivR_values: np.ndarray, x_values: np.ndarray=x_values, set_best_values=True, results_to_csv=False, filter_technique: str=None, filter_order: str=None, filter_cutoff: str=None, filter_numNei: str=None) -> pd.DataFrame:
         self.__reset_attributes()
-        print('Starting simulation...')
-        list_b_values = []
-        list_p_values = []
+        # print('Starting simulation...')
+        list_b_values      = []
+        list_p_values      = []
         list_period_values = []
-        list_adivR_values = []
-        list_chi2_values = []
+        list_adivR_values  = []
+        list_chi2_values   = []
 
-        total = len(b_values) * len(p_values) * len(period_values) * len(adivR_values)
-        with tqdm(range(total), colour='blue', desc='Simulating') as pbar:
-            for b_impact in b_values:
-                for p in p_values:
-                    for period in period_values:
-                        for adivR in adivR_values:
-                            simulated_curve = self.__simulate(observed_curve=observed_curve, b_impact=b_impact, p=p, period=period, adivR=adivR, x_values=x_values)
-                            chi2 = self.__calculate_chi2(observed_curve=observed_curve, simulated_curve=simulated_curve)
+        # total = len(b_values) * len(p_values) * len(period_values) * len(adivR_values)
+        for b_impact in b_values:
+            for p in p_values:
+                for period in period_values:
+                    for adivR in adivR_values:
+                        simulated_curve = self.__simulate(observed_curve=observed_curve, b_impact=b_impact, p=p, period=period, adivR=adivR, x_values=x_values)
+                        chi2 = self.__calculate_chi2(observed_curve=observed_curve, simulated_curve=simulated_curve)
 
-                            list_b_values.append(b_impact)
-                            list_p_values.append(p)
-                            list_period_values.append(period)
-                            list_adivR_values.append(adivR)
-                            list_chi2_values.append(chi2)
-                            pbar.update(1)
+                        list_b_values.append(b_impact)
+                        list_p_values.append(p)
+                        list_period_values.append(period)
+                        list_adivR_values.append(adivR)
+                        list_chi2_values.append(chi2)
 
         self.simulation_table['b_impact'] = list_b_values
         self.simulation_table['p'] = list_p_values
@@ -78,25 +76,23 @@ class Simulate():
             object.__setattr__(self, 'period_best', sorted_table.loc[sorted_table.index[0]][2])
             object.__setattr__(self, 'adivR_best', sorted_table.loc[sorted_table.index[0]][3])
             object.__setattr__(self, 'chi2_best', sorted_table.loc[sorted_table.index[0]][4])
-        
-        uncertanties = {'b_impact_uncertanties': self.__calculate_uncertains('b_impact', 1),
-                        'p_uncertanties': self.__calculate_uncertains('p', 1),
-                        'period_uncertanties': self.__calculate_uncertains('period', 1),
-                        'adivR_uncertanties': self.__calculate_uncertains('adivR', 1)}
-                        
 
         final_results = pd.DataFrame(
             dict(
-                CoRoT_ID = [], 
-                period   = [],
-                e_period = [],
-                p        = [],
-                e_p      = [],
-                adivR    = [],
-                e_adivR  = [],
-                b        = [],
-                e_b      = [],
-                chi2     = [],
+                CoRoT_ID         = [], 
+                period_deleuil   = [],
+                period           = [],
+                e_period         = [],
+                p_deleuil        = [],
+                p                = [],
+                e_p              = [],
+                adivR_deleuil    = [],
+                adivR            = [],
+                e_adivR          = [],
+                b_deleuil        = [],
+                b                = [],
+                e_b              = [],
+                chi2             = [],
                 filter_technique = [],
                 filter_order     = [],
                 filter_cutoff    = [],
@@ -106,16 +102,21 @@ class Simulate():
         
         final_results = final_results.append(
             dict(
-                CoRoT_ID = CoRoT_ID,
-                period   = self.period_best,
-                e_period = uncertanties['period_uncertanties'],
-                p        = self.p_best,
-                e_p      = uncertanties['p_uncertanties'],
-                adivR    = self.adivR_best,
-                e_adivR  = uncertanties['adivR_uncertanties'],
-                b        = self.b_impact_best,
-                e_b      = uncertanties['b_impact_uncertanties'],               
-                chi2     = self.chi2_best,
+                CoRoT_ID         = CoRoT_ID,
+                period_deleuil   = LightCurve.get_true_value(CoRoT_ID, 'Per'),
+                period           = self.period_best,
+                e_period         = self.__calculate_uncertains('period', 1),
+                p_deleuil        = LightCurve.get_true_value(CoRoT_ID, 'Rp/R*'),
+                p                = self.p_best,
+                e_p              = self.__calculate_uncertains('p', 1),
+                adivR_deleuil    = LightCurve.get_true_value(CoRoT_ID, 'a/R*'),
+                adivR            = self.adivR_best,
+                e_adivR          = self.__calculate_uncertains('adivR', 1),
+                b_deleuil        = LightCurve.get_true_value(CoRoT_ID, 'b'),
+                b                = self.b_impact_best,
+                e_b              = self.__calculate_uncertains('b_impact', 1),               
+                chi2             = self.chi2_best,
+                
                 filter_technique = filter_technique,
                 filter_order     = filter_order,
                 filter_cutoff    = filter_cutoff,
@@ -125,13 +126,8 @@ class Simulate():
         final_results.set_index('CoRoT_ID', inplace=True)
         return final_results
 
-        # if results_to_csv: # REFORMULAR
+        # if results_to_csv: #TODO REFORMULAR
         #     sorted_table.to_csv('final_table.csv', index=False)
-
-    def simulate_values_for_filters(self, filter_technique: str, filter_order: str=None, filter_cutoff: str=None, filter_numNei: str=None) -> pd.DataFrame:
-        self.__reset_attributes()
-
-        pass
 
     def simulate_lightcurve(self, observed_curve: LightCurve, b_impact: float = None, p: float = None, period: float = None, adivR: float = None, x_values: np.ndarray=x_values) -> SimulatedPhaseFoldedLightCurve:
         self.__reset_attributes()
@@ -395,13 +391,6 @@ class Simulate():
         
         return np.std(data)
 
-        # # x_bar = np.mean(data)
-        # sigma = np.std(data)
-        # n = len(data)
-        # z = 1.96  # -> 95%
-
-        # return (z*sigma)/sqrt(n)
-
     def __reset_attributes(self) -> None:
         object.__setattr__(self, 'b_impact_best', None)
         object.__setattr__(self, 'p_best', None)
@@ -413,4 +402,3 @@ class Simulate():
 
 
     
-
