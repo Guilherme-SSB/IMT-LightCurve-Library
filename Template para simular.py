@@ -43,8 +43,8 @@ real_parameters = [period_real, p_real, adivR_real, b_real]
 
 # Defining grid of parameters to search
 period_values = LightCurve.define_interval_period(period_real)
-p_values = LightCurve.define_interval_p(p_real)
 adivR_values = LightCurve.define_interval_adivR(adivR_real)
+p_values = LightCurve.define_interval_p(p_real)
 b_values = LightCurve.define_interval_b(b_real)
 
 

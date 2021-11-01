@@ -10,12 +10,18 @@ from imt_lightcurve.simulation.simulation import Simulate
 
 INPUT_PATH = 'C:/Users/guisa/Desktop/Arquivos_IC/folded_curves'
 
+total_files = 0
+for root_dir_path, sub_dirs, files in os.walk(INPUT_PATH):
+    for file in files:
+        total_files += 1
+    pass
+print(f'There are {total_files} curves to test\n\n')
+
 # %%
 final_table = pd.DataFrame()
-total = 2358
 
 print('Starting simulation...')
-with tqdm(range(total), colour='blue', desc='Simulating') as pbar:
+with tqdm(range(total_files), colour='blue', desc='Simulating') as pbar:
     for root_dir_path, sub_dirs, files in os.walk(INPUT_PATH):
         for file in files:
             n = ""
@@ -98,8 +104,6 @@ with tqdm(range(total), colour='blue', desc='Simulating') as pbar:
                 final_table.to_csv('FINAL_TABLE.csv', index=False)
                 raise Exception('Something went wrong! Saving results and closing the script')
 
-            
-final_table.head()
                 
 final_table.to_csv('FINAL_TABLE.csv', index=True)
 
@@ -107,9 +111,7 @@ final_table.to_csv('FINAL_TABLE.csv', index=True)
 
 # %%
 
-import pandas as pd
-
-results_final = pd.read_csv('FINAL_TABLE.csv', index_col='CoRoT_ID')
+# results_final = pd.read_csv('FINAL_TABLE.csv', index_col='CoRoT_ID')
 
 # results_final.sort_values(by='e_period').head()                                       # butterworth, n1, f01 (e_period = 0.0141421356237306)
 # results_final.sort_values(by='e_p').head()                                            # butterworth, n3, f06 (e_p = 0)  
