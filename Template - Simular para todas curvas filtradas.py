@@ -1,14 +1,17 @@
 #%% Imports
 import os
-import numpy as np
-import pandas as pd
 import warnings
 warnings.filterwarnings("ignore")
+
+import numpy as np
+import pandas as pd
+
 from tqdm import tqdm
+
 from imt_lightcurve.models.lightcurve import LightCurve
 from imt_lightcurve.simulation.simulation import Simulate
 
-INPUT_PATH = 'C:/Users/guisa/Desktop/Arquivos_IC/folded_curves'
+INPUT_PATH = 'C:/Users/guisa/Google Drive/01 - Iniciação Científica/02 - Datasets/exoplanets_confirmed/folded_curves'
 
 total_files = 0
 for root_dir_path, sub_dirs, files in os.walk(INPUT_PATH):
