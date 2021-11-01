@@ -1,5 +1,4 @@
 import os
-import re
 import shutil
 from statistics import median
 
@@ -7,6 +6,7 @@ import numpy as np
 import pandas as pd
 import scipy.signal as ssg
 from astropy.io import fits
+from tqdm import tqdm
 
 from imt_lightcurve.models.lightcurve import LightCurve
 
@@ -165,77 +165,86 @@ class DATAHelper():
     @staticmethod
     def compute_folded_curve(INPUT_CURVES_PATH: str, OUTPUT_FOLDED_CURVES_PATH: str):
         OUTPUT_FOLDED_CURVES_PATH = OUTPUT_FOLDED_CURVES_PATH.replace("\\", "/")
+        total_files = 0
         for root_dir_path, sub_dirs, files in os.walk(INPUT_CURVES_PATH):
             for file in files:
                 if file.endswith('.csv'):
-                    CURVE_PATH = os.path.join(root_dir_path, file)
-                    CURVE_PATH = CURVE_PATH.replace("\\", "/")
-                    CURVE_ID = CURVE_PATH.split('/')[-1].split('_')[-1].split('.')[0]
-                    FILTER_TECHNIQUE = CURVE_PATH.split('/')[6]
-
-                    if FILTER_TECHNIQUE == 'bessel':
-                        n = CURVE_PATH.split('/')[-3]
-                        f = CURVE_PATH.split('/')[-2]
-                        title = f'LC {CURVE_ID}. Bessel {n} and {f}'
-
-                    if FILTER_TECHNIQUE == 'butterworth':
-                        n = CURVE_PATH.split('/')[-3]
-                        f = CURVE_PATH.split('/')[-2]
-                        title = f'LC {CURVE_ID}. Butterworth {n} and {f}'
-
-                    if FILTER_TECHNIQUE == 'gaussian':
-                        f = CURVE_PATH.split('/')[-2]
-                        title = f'LC {CURVE_ID}. Gaussian {f}'
-
-                    if FILTER_TECHNIQUE == 'ideal':
-                        f = CURVE_PATH.split('/')[-2]
-                        title = f'LC {CURVE_ID}. Ideal {f}'
-
-                    if FILTER_TECHNIQUE == 'median':
-                        numNei = CURVE_PATH.split('/')[-2][-1:]
-                        title = f'LC {CURVE_ID}. Median numNei {numNei}'
-
-                    # Reading a curve
-                    data = pd.read_csv(CURVE_PATH)
-                    curve = LightCurve(data.DATE, data.WHITEFLUX)
-                    # curve.plot(title=title)
-
-                    # Computing folded curve
-                    folded_curve = curve.fold(CURVE_ID)
-                    # folded_curve.plot(title=f'Folded LC {CURVE_ID}')
-
-                    # Error column
-                    error = np.std(folded_curve.flux)
-                    error_array = [error for i in range(len(folded_curve.flux))]
-
-                    # Creating a new pd.DataFrame
-                    concat_dict = {
-                    "TIME": pd.Series(folded_curve.time), 
-                    "FOLD_FLUX": pd.Series(folded_curve.flux.to_numpy()),
-                    "ERROR": pd.Series(error_array)
-                    }
-
-                    folded_data = pd.concat(concat_dict, axis=1)
-
-                    # Saving 
-                    SALVING_PATH = OUTPUT_FOLDED_CURVES_PATH + '/' +  '/'.join(CURVE_PATH.split('/')[6:])
-                    folded_data.to_csv(SALVING_PATH, index=False)
-
-                    if FILTER_TECHNIQUE == 'bessel':
-                        print(f'Saved LC {CURVE_ID} for Bessel {n} and {f}')
-
-                    if FILTER_TECHNIQUE == 'butterworth':
-                        print(f'Saved LC {CURVE_ID} for Butterworth {n} and {f}')
-
-                    if FILTER_TECHNIQUE == 'gaussian':
-                        print(f'Saved LC {CURVE_ID} for Gaussian {f}')
-
-                    if FILTER_TECHNIQUE == 'ideal':
-                        print(f'Saved LC {CURVE_ID} for Ideal {f}')
-
-                    if FILTER_TECHNIQUE == 'median':
-                        print(f'Saved LC {CURVE_ID} for Median {numNei}')
-
-
-
+                    total_files += 1
         
+
+        with tqdm(range(total_files), colour='blue', desc='Simulating') as pbar:
+            for root_dir_path, sub_dirs, files in os.walk(INPUT_CURVES_PATH):
+                for file in files:
+                    if file.endswith('.csv'):
+                        CURVE_PATH = os.path.join(root_dir_path, file)
+                        CURVE_PATH = CURVE_PATH.replace("\\", "/")
+                        CURVE_ID = CURVE_PATH.split('/')[-1].split('_')[-1].split('.')[0]
+                        FILTER_TECHNIQUE = CURVE_PATH.split('/')[6]
+
+                        if FILTER_TECHNIQUE == 'bessel':
+                            n = CURVE_PATH.split('/')[-3]
+                            f = CURVE_PATH.split('/')[-2]
+                            title = f'LC {CURVE_ID}. Bessel {n} and {f}'
+
+                        if FILTER_TECHNIQUE == 'butterworth':
+                            n = CURVE_PATH.split('/')[-3]
+                            f = CURVE_PATH.split('/')[-2]
+                            title = f'LC {CURVE_ID}. Butterworth {n} and {f}'
+
+                        if FILTER_TECHNIQUE == 'gaussian':
+                            f = CURVE_PATH.split('/')[-2]
+                            title = f'LC {CURVE_ID}. Gaussian {f}'
+
+                        if FILTER_TECHNIQUE == 'ideal':
+                            f = CURVE_PATH.split('/')[-2]
+                            title = f'LC {CURVE_ID}. Ideal {f}'
+
+                        if FILTER_TECHNIQUE == 'median':
+                            numNei = CURVE_PATH.split('/')[-2][-1:]
+                            title = f'LC {CURVE_ID}. Median numNei {numNei}'
+
+                        # Reading a curve
+                        data = pd.read_csv(CURVE_PATH)
+                        curve = LightCurve(data.DATE, data.WHITEFLUX)
+                        # curve.plot(title=title)
+
+                        # Computing folded curve
+                        folded_curve = curve.fold(CURVE_ID)
+                        # folded_curve.plot(title=f'Folded LC {CURVE_ID}')
+
+                        # Error column
+                        error = np.std(folded_curve.flux)
+                        error_array = [error for i in range(len(folded_curve.flux))]
+
+                        # Creating a new pd.DataFrame
+                        concat_dict = {
+                        "TIME": pd.Series(folded_curve.time), 
+                        "FOLD_FLUX": pd.Series(folded_curve.flux.to_numpy()),
+                        "ERROR": pd.Series(error_array)
+                        }
+
+                        folded_data = pd.concat(concat_dict, axis=1)
+
+                        # Saving 
+                        SALVING_PATH = OUTPUT_FOLDED_CURVES_PATH + '/' +  '/'.join(CURVE_PATH.split('/')[6:])
+                        folded_data.to_csv(SALVING_PATH, index=False)
+                        pbar.update(1)
+
+                        # if FILTER_TECHNIQUE == 'bessel':
+                        #     print(f'Saved LC {CURVE_ID} for Bessel {n} and {f}')
+
+                        # if FILTER_TECHNIQUE == 'butterworth':
+                        #     print(f'Saved LC {CURVE_ID} for Butterworth {n} and {f}')
+
+                        # if FILTER_TECHNIQUE == 'gaussian':
+                        #     print(f'Saved LC {CURVE_ID} for Gaussian {f}')
+
+                        # if FILTER_TECHNIQUE == 'ideal':
+                        #     print(f'Saved LC {CURVE_ID} for Ideal {f}')
+
+                        # if FILTER_TECHNIQUE == 'median':
+                        #     print(f'Saved LC {CURVE_ID} for Median {numNei}')
+
+
+
+            

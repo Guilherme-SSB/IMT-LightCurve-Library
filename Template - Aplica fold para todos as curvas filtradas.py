@@ -3,7 +3,7 @@ from imt_lightcurve.data_helper.helper import DATAHelper
 
 DATAHelper.compute_folded_curve(
     r'G:\Meu Drive\01 - Iniciação Científica\02 - Datasets\exoplanets_confirmed\filters',
-    r'C:\Users\guisa\Desktop\folded_curves')
+    r'C:\Users\guisa\Desktop\full_folded_curves')
 
 
 # %%
