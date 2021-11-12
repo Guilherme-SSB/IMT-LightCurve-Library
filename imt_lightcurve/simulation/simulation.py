@@ -42,6 +42,7 @@ class Simulate():
     # Class methods
     def simulate_values(self, CoRoT_ID: int, observed_curve: LightCurve, b_values: np.ndarray, p_values: np.ndarray, period_values: np.ndarray, adivR_values: np.ndarray, x_values: np.ndarray=x_values, set_best_values=True, results_to_csv=False, filter_technique: str=None, filter_order: str=None, filter_cutoff: str=None, filter_numNei: str=None) -> pd.DataFrame:
         self.__reset_attributes()
+        tolerance = 1
         # print('Starting simulation...')
         list_b_values      = []
         list_p_values      = []
@@ -105,16 +106,16 @@ class Simulate():
                 CoRoT_ID         = CoRoT_ID,
                 period_deleuil   = LightCurve.get_true_value(CoRoT_ID, 'Per'),
                 period           = self.period_best,
-                e_period         = self.__calculate_uncertains('period', 1),
+                e_period         = self.__calculate_uncertains('period', tolerance),
                 p_deleuil        = LightCurve.get_true_value(CoRoT_ID, 'Rp/R*'),
                 p                = self.p_best,
-                e_p              = self.__calculate_uncertains('p', 1),
+                e_p              = self.__calculate_uncertains('p', tolerance),
                 adivR_deleuil    = LightCurve.get_true_value(CoRoT_ID, 'a/R*'),
                 adivR            = self.adivR_best,
-                e_adivR          = self.__calculate_uncertains('adivR', 1),
+                e_adivR          = self.__calculate_uncertains('adivR', tolerance),
                 b_deleuil        = LightCurve.get_true_value(CoRoT_ID, 'b'),
                 b                = self.b_impact_best,
-                e_b              = self.__calculate_uncertains('b_impact', 1),               
+                e_b              = self.__calculate_uncertains('b_impact', tolerance),               
                 chi2             = self.chi2_best,
                 
                 filter_technique = filter_technique,
