@@ -76,67 +76,11 @@ with tqdm(range(total_files), colour='blue', desc='Simulating') as pbar:
                     raw_parameters_table = raw_parameters_table.append(results)
                     pbar.update(1)
                 except:
-                    raw_parameters_table.to_csv('ORIGINAL_PARAMETERS.csv', index=False)
+                    raw_parameters_table.to_csv('results_table/ORIGINAL_PARAMETERS.csv', index=False)
                     raise Exception('Something went wrong! Saving results and closing the script')
 
 raw_parameters_table = raw_parameters_table.drop(['filter_technique', 'filter_order', 'filter_cutoff', 'filter_numNei'], axis=1)
-raw_parameters_table.to_csv('ORIGINAL_PARAMETERS_TABLE.csv', index=True)
+raw_parameters_table.to_csv('results_table/ORIGINAL_PARAMETERS_TABLE.csv', index=True)
 
 # %%
 
-
-"""
-100725706
-101086161 
-315239728 
-315211361 
-315198039
-110839339 
-106017681 
-105891283 
-105833549 
-105819653
-105793995 
-105209106 
-102912369 
-102890318 
-102764809
-102671819 
-101368192
-652180991
-"""
-ID_ANALYSIS = 105891283
-
-raw_parameters_table.loc[ID_ANALYSIS]#.sort_values(by='chi2').head()
-
-# %%
-
-# Importing lightcurve data from github
-data = pd.read_csv('https://raw.githubusercontent.com/Guilherme-SSB/IC-CoRoT_Kepler/main/resampled_files/' + str(ID_ANALYSIS) + '.csv')
-time = data.DATE.to_numpy()
-flux = data.WHITEFLUX.to_numpy()
-
-# Create the LightCurve object
-curve = LightCurve(time=time, flux=flux)
-# curve.plot()
-
-# Filtered curve
-filtered_curve = curve.median_filter(9)
-filtered_curve.view_filtering_results()
-# %%
-
-folded_curve = curve.fold(str(ID_ANALYSIS))
-aux = LightCurve(filtered_curve.time, filtered_curve.filtered_flux)
-filtered_folded_curve = aux.fold(str(ID_ANALYSIS))
-
-multi_line_plot(
-    folded_curve.time,
-    folded_curve.flux,
-    filtered_folded_curve.flux,
-    label_y1='Original LC',
-    label_y2='Filtered LC',
-    title='Folded LC Original x Filtered ',
-    y_axis='Normalized flux'
-)
-
-# %%

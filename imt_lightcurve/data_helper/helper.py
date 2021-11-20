@@ -179,7 +179,13 @@ class DATAHelper():
                         CURVE_PATH = os.path.join(root_dir_path, file)
                         CURVE_PATH = CURVE_PATH.replace("\\", "/")
                         CURVE_ID = CURVE_PATH.split('/')[-1].split('_')[-1].split('.')[0]
-                        FILTER_TECHNIQUE = CURVE_PATH.split('/')[6]
+                        FILTER_TECHNIQUE = CURVE_PATH.split('/')[8]
+
+                        # print(CURVE_PATH)
+                        # print(FILTER_TECHNIQUE)
+                        # print('\n\n\n')
+                        # break
+                        
 
                         if FILTER_TECHNIQUE == 'bessel':
                             n = CURVE_PATH.split('/')[-3]
@@ -207,6 +213,7 @@ class DATAHelper():
                         data = pd.read_csv(CURVE_PATH)
                         curve = LightCurve(data.DATE.to_numpy(), data.WHITEFLUX.to_numpy())
                         # curve.plot(title=title)
+                        # break
                         
 
                         # Computing folded curve
@@ -223,7 +230,7 @@ class DATAHelper():
                         folded_data = pd.concat(concat_dict, axis=1)
 
                         # Saving 
-                        SAVING_PATH = OUTPUT_FOLDED_CURVES_PATH + '/' +  '/'.join(CURVE_PATH.split('/')[6:])
+                        SAVING_PATH = OUTPUT_FOLDED_CURVES_PATH + '/' +  '/'.join(CURVE_PATH.split('/')[8:])
                         folded_data.to_csv(SAVING_PATH, index=False)
                         pbar.update(1)
 

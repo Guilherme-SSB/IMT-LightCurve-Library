@@ -223,6 +223,26 @@ class LightCurve(BaseLightCurve):
                     std = np.std(tmp)
                     error_array.append(std)
 
+        error_array = np.array(error_array)
+
+        # Implicit error
+        implicit_noise_list = []
+
+        for i in range(totalEclipses-1):
+            flux_between_one_eclipse = self.flux[ (time > positions[i]+width ) & (time < positions[i+1]-width) ]
+            # time_between_on_eclipse = time[ (time > positions[i]+width) & (time < positions[i+1]-width) ]
+            # curve_tmp = LightCurve(time_between_on_eclipse, flux_between_one_eclipse)
+            # curve_tmp.plot(f'curve {i}')
+            implicit_noise = np.std(flux_between_one_eclipse)
+            implicit_noise_list.append(implicit_noise)
+
+        implicit_noise_mean = np.mean(implicit_noise_list)
+
+        # print(f'Implicit noise mean = {implicit_noise_mean}')
+
+    	# Summing implicit noise to all values of uncertanties
+        error_array += implicit_noise_mean
+
         folded_curve.flux_error = error_array
 
         return folded_curve
