@@ -205,22 +205,19 @@ class DATAHelper():
 
                         # Reading a curve
                         data = pd.read_csv(CURVE_PATH)
-                        curve = LightCurve(data.DATE, data.WHITEFLUX)
+                        curve = LightCurve(data.DATE.to_numpy(), data.WHITEFLUX.to_numpy())
                         # curve.plot(title=title)
+                        
 
                         # Computing folded curve
                         folded_curve = curve.fold(CURVE_ID)
                         # folded_curve.plot(title=f'Folded LC {CURVE_ID}')
 
-                        # Error column
-                        error = np.std(folded_curve.flux)
-                        error_array = [error for i in range(len(folded_curve.flux))]
-
                         # Creating a new pd.DataFrame
                         concat_dict = {
                         "TIME": pd.Series(folded_curve.time), 
-                        "FOLD_FLUX": pd.Series(folded_curve.flux.to_numpy()),
-                        "ERROR": pd.Series(error_array)
+                        "FOLD_FLUX": pd.Series(folded_curve.flux),
+                        "ERROR": pd.Series(folded_curve.flux_error)
                         }
 
                         folded_data = pd.concat(concat_dict, axis=1)

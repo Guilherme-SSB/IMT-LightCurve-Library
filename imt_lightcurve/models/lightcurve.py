@@ -197,9 +197,11 @@ class LightCurve(BaseLightCurve):
 
         # Summing all eclipses
         sum_eclipses_flux = 0
+        fluxes_dict = {}
         for eclipse in range(totalEclipses):
             cond = (time > (positions[eclipse]-(width))) & (time < (positions[eclipse]+(width)))
-        sum_eclipses_flux += self.flux[cond]
+            fluxes_dict[eclipse] = self.flux[cond]#.to_numpy()
+            sum_eclipses_flux += self.flux[cond]
 
         # Computing the average eclipse
         avg_eclipses_flux = sum_eclipses_flux/totalEclipses
@@ -209,8 +211,18 @@ class LightCurve(BaseLightCurve):
         time_fold = np.arange(-len(avg_eclipses_flux)/2, +len(avg_eclipses_flux)/2)
 
         folded_curve = PhaseFoldedLightCurve(time=time_fold, flux=avg_eclipses_flux)
-        error = np.std(avg_eclipses_flux) #TODO Revisar esse erro aqui !!
-        error_array = [error for i in range(len(avg_eclipses_flux))]
+        num_index = len(fluxes_dict[0])
+        error_array = [] 
+
+        i=0
+        for i in range(num_index):
+            tmp = []
+            for value in fluxes_dict.values():
+                tmp.append(value[i])
+                if len(tmp) == len(fluxes_dict):
+                    std = np.std(tmp)
+                    error_array.append(std)
+
         folded_curve.flux_error = error_array
 
         return folded_curve
@@ -252,7 +264,7 @@ class LightCurve(BaseLightCurve):
             eclipses_position = [391, 1907, 2403, 2909, 3414, 3910, 4416, 4921, 5412, 5917, 6422, 6927, 7433, 7938, 8445, 8951, 9457, 9963, 10467, 10973, 11479, 11986, 12491, 13080, 13503, 14009, 14515, 15021]
             eclipses_width = 8
             
-        if corot_id == '105819653': #TODO Remove ?
+        if corot_id == '105819653':
             eclipses_position = [2689, 3700, 4716, 5709, 6724, 7738, 8755, 9771, 10786, 11798, 12816, 14847]
             eclipses_width = 20
         

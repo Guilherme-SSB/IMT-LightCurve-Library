@@ -11,7 +11,7 @@ from tqdm import tqdm
 from imt_lightcurve.models.lightcurve import LightCurve
 from imt_lightcurve.simulation.simulation import Simulate
 
-INPUT_PATH = 'C:/Users/guisa/Google Drive/01 - Iniciação Científica/02 - Datasets/exoplanets_confirmed/folded_curves'
+INPUT_PATH = r'G:\Meu Drive\01 - Iniciação Científica/02 - Datasets/exoplanets_confirmed/folded_curves_with_error_fixed'
 
 total_files = 0
 for root_dir_path, sub_dirs, files in os.walk(INPUT_PATH):
@@ -110,7 +110,7 @@ with tqdm(range(total_files), colour='blue', desc='Simulating') as pbar:
                     raise Exception('Something went wrong! Saving results and closing the script')
 
                 
-final_table.to_csv('FINAL_TABLE.csv', index=True)
+final_table.to_csv('FINAL_TABLE_with_fixed_uncertanties.csv', index=True)
 
 
 # %%

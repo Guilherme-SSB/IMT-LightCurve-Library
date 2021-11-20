@@ -1,13 +1,13 @@
 #%%
 from imt_lightcurve.data_helper.helper import DATAHelper
 
-# DATAHelper.compute_folded_curve(
-#     r'C:\Users\guisa\Google Drive\01 - Iniciação Científica\02 - Datasets\exoplanets_confirmed\filters',
-#     r'C:\Users\guisa\Google Drive\01 - Iniciação Científica\02 - Datasets\exoplanets_confirmed\folded_curves')
+DATAHelper.compute_folded_curve(
+    r'G:\Meu Drive\01 - Iniciação Científica\02 - Datasets\exoplanets_confirmed\filters',
+    r'G:\Meu Drive\01 - Iniciação Científica\02 - Datasets\exoplanets_confirmed\folded_curves_with_error_fixed')
 
-DATAHelper.compute_folded_curve_new(
-    r'C:\Users\guisa\Google Drive\01 - Iniciação Científica\02 - Datasets\exoplanets_confirmed\csv_files',
-    r'C:\Users\guisa\Google Drive\01 - Iniciação Científica\02 - Datasets\exoplanets_confirmed\original_folded_curves')
+# DATAHelper.compute_folded_curve_new(
+#     r'C:\Users\guisa\Google Drive\01 - Iniciação Científica\02 - Datasets\exoplanets_confirmed\csv_files',
+#     r'C:\Users\guisa\Google Drive\01 - Iniciação Científica\02 - Datasets\exoplanets_confirmed\original_folded_curves')
 
 
 
