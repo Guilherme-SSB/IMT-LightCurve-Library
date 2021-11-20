@@ -6,7 +6,7 @@ from imt_lightcurve.models.lightcurve import LightCurve
 from imt_lightcurve.simulation.simulation import  Simulate
 
 # Chosen a LightCurve to simulation process
-CURVE_ID = '105891283'
+CURVE_ID = '102764809'
 
 # Importing lightcurve data from github
 data = pd.read_csv('https://raw.githubusercontent.com/Guilherme-SSB/IC-CoRoT_Kepler/main/resampled_files/' + CURVE_ID + '.csv')
@@ -38,7 +38,7 @@ adivR_real = LightCurve.get_true_value(curve_id, 'a/R*')
 ## Transit impact parameter
 b_real = LightCurve.get_true_value(curve_id, 'b')
 
-real_parameters = [period_real, p_real, adivR_real, b_real]
+real_parameters = [period_real, adivR_real, p_real, b_real]
 
 # Defining grid of parameters to search
 period_values = LightCurve.define_interval_period(period_real)

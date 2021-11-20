@@ -200,7 +200,7 @@ class LightCurve(BaseLightCurve):
         fluxes_dict = {}
         for eclipse in range(totalEclipses):
             cond = (time > (positions[eclipse]-(width))) & (time < (positions[eclipse]+(width)))
-            fluxes_dict[eclipse] = self.flux[cond]#.to_numpy()
+            fluxes_dict[eclipse] = self.flux[cond]
             sum_eclipses_flux += self.flux[cond]
 
         # Computing the average eclipse

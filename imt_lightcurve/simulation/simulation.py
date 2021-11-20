@@ -377,16 +377,15 @@ class Simulate():
 
     def __calculate_chi2(self, observed_curve: LightCurve, simulated_curve: SimulatedPhaseFoldedLightCurve) -> float:
         chi2 = 0
-        # chi2 = sum(((observed_curve.flux - simulated_curve.simulated_flux)** 2)/(observed_curve.flux_error**2))
         chi2 = sum(((observed_curve.flux - simulated_curve.simulated_flux)** 2)/(np.power(observed_curve.flux_error, 2)))
         return chi2
 
-    def __calculate_uncertains(self, parameter: str, tolarance: float) -> float:
+    def __calculate_uncertains(self, parameter: str, tolerance: float) -> float:
         parameter_values = self.simulation_table[parameter]
         min_error = self.simulation_table['chi2'].min()
         data = []
         for i in range(len(self.simulation_table['chi2'])):
-            if (self.simulation_table['chi2'].loc[i] < (min_error + tolarance)):
+            if (self.simulation_table['chi2'].loc[i] < (min_error + tolerance)):
                 data.append(parameter_values.loc[i])
         data = np.array(data)
         
