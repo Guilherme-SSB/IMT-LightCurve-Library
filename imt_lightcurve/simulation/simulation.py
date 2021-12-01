@@ -387,9 +387,23 @@ class Simulate():
         for i in range(len(self.simulation_table['chi2'])):
             if (self.simulation_table['chi2'].loc[i] < (min_error + tolerance)):
                 data.append(parameter_values.loc[i])
+        ### Standard deviation of data: 
         data = np.array(data)
+        error = np.std(data)
+        return error
+
+        ### Building a confidence interval
+        # from scipy.stats import t
+        # alpha = 0.01 # 99%
+        # t_error = t.ppf(1-alpha, df=len(data))
+        # std = np.std(data)
+        # n = len(data)
+
+        # uncertantie = t_error * std/np.sqrt(n)
         
-        return np.std(data)
+        # return uncertantie
+
+        
 
     def __reset_attributes(self) -> None:
         object.__setattr__(self, 'b_impact_best', None)

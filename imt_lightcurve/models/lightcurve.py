@@ -5,10 +5,10 @@ from abc import abstractmethod
 from shutil import Error
 import os
 from math import exp, factorial
-# import lightkurve as lk
+import lightkurve as lk
 import numpy as np
 import pandas as pd
-# from control import TransferFunction, evalfr
+from control import TransferFunction, evalfr
 from scipy.signal import find_peaks, peak_widths
 
 from scipy.signal import medfilt
@@ -212,7 +212,7 @@ class LightCurve(BaseLightCurve):
 
         folded_curve = PhaseFoldedLightCurve(time=time_fold, flux=avg_eclipses_flux)
         num_index = len(fluxes_dict[0])
-        error_array = [] 
+        std_array = [] 
 
         i=0
         for i in range(num_index):
@@ -221,9 +221,9 @@ class LightCurve(BaseLightCurve):
                 tmp.append(value[i])
                 if len(tmp) == len(fluxes_dict):
                     std = np.std(tmp)
-                    error_array.append(std)
+                    std_array.append(std)
 
-        error_array = np.array(error_array)
+        std_array = np.array(std_array)
 
         # Implicit error
         implicit_noise_list = []
@@ -241,7 +241,7 @@ class LightCurve(BaseLightCurve):
         # print(f'Implicit noise mean = {implicit_noise_mean}')
 
     	# Summing implicit noise to all values of uncertanties
-        error_array += implicit_noise_mean
+        error_array = np.sqrt( np.power(std_array, 2) + implicit_noise_mean**2 )
 
         folded_curve.flux_error = error_array
 
@@ -351,8 +351,13 @@ class LightCurve(BaseLightCurve):
 
     @abstractmethod
     def define_interval_period(period: float) -> np.ndarray:
-        # period_values = np.arange(round(period, 2)-0.02, round(period, 2)+0.03, 0.01)
-        period_values = np.arange(round(period, 4)-0.0002, round(period, 4)+0.0003, 0.0001)
+
+        # delta = 0.01
+        period_values = np.arange(round(period, 2)-0.02, round(period, 2)+0.03, 0.01)
+
+        # delta = 0.0001
+        # period_values = np.arange(round(period, 4)-0.0002, round(period, 4)+0.0003, 0.0001)
+
         period_values = LightCurve.__replace_negative_values(period_values)
         period_values = LightCurve.__remove_duplicate_values(period_values)
         period_values = LightCurve.__replace_zero_values(period_values)
@@ -362,8 +367,13 @@ class LightCurve(BaseLightCurve):
 
     @abstractmethod
     def define_interval_p(p: float) -> np.ndarray:
-        # p_values = np.arange(round(p, 2)-0.02, round(p, 2)+0.03, 0.01)
-        p_values = np.arange(round(p, 4)-0.0002, round(p, 4)+0.0003, 0.0001)
+
+        # delta = 0.01
+        p_values = np.arange(round(p, 2)-0.02, round(p, 2)+0.03, 0.01)
+
+        # delta = 0.0001
+        # p_values = np.arange(round(p, 4)-0.0002, round(p, 4)+0.0003, 0.0001)
+
         p_values = LightCurve.__replace_negative_values(p_values)
         p_values = LightCurve.__remove_duplicate_values(p_values)
         p_values = LightCurve.__replace_zero_values(p_values)
@@ -373,8 +383,13 @@ class LightCurve(BaseLightCurve):
 
     @abstractmethod
     def define_interval_adivR(adivR: float) -> np.ndarray:
+
+        # delta = 0.01
         adivR_values = np.arange(round(adivR, 2)-0.02, round(adivR, 2)+0.03, 0.01)
+
+        # delta = 0.001
         # adivR_values = np.arange(round(adivR, 2)-0.002, round(adivR, 2)+0.003, 0.001)
+
         adivR_values = LightCurve.__replace_negative_values(adivR_values)
         adivR_values = LightCurve.__remove_duplicate_values(adivR_values)
         adivR_values = LightCurve.__replace_zero_values(adivR_values)
@@ -384,8 +399,14 @@ class LightCurve(BaseLightCurve):
 
     @abstractmethod
     def define_interval_b(b: float) -> np.ndarray:
+
+        # delta = 0.01
         b_values = np.arange(round(b, 2)-0.02, round(b, 2)+0.03, 0.01)
+
+        # delta = 0.001
         # b_values = np.arange(round(b, 2)-0.002, round(b, 2)+0.003, 0.001)
+
+
         b_values = LightCurve.__replace_negative_values(b_values)
         b_values = LightCurve.__remove_duplicate_values(b_values)
         b_values = LightCurve.__replace_zero_values(b_values)

@@ -10,10 +10,9 @@ from tqdm import tqdm
 
 from imt_lightcurve.models.lightcurve import LightCurve
 from imt_lightcurve.simulation.simulation import Simulate
-from imt_lightcurve.visualization.data_viz import multi_line_plot
 
 
-INPUT_PATH = 'C:/Users/guisa/Google Drive/01 - Iniciação Científica/02 - Datasets/exoplanets_confirmed/original_folded_curves'
+INPUT_PATH = 'C:/Users/guisa/Google Drive/01 - Iniciação Científica/02 - Datasets/exoplanets_confirmed/original_folded_curves_with_error_fixed'
 
 total_files = 0
 for root_dir_path, sub_dirs, files in os.walk(INPUT_PATH):
@@ -76,11 +75,11 @@ with tqdm(range(total_files), colour='blue', desc='Simulating') as pbar:
                     raw_parameters_table = raw_parameters_table.append(results)
                     pbar.update(1)
                 except:
-                    raw_parameters_table.to_csv('results_table/ORIGINAL_PARAMETERS.csv', index=False)
+                    raw_parameters_table.to_csv('results_table/ORIGINAL_PARAMETERS_ERROR_FIXED.csv', index=False)
                     raise Exception('Something went wrong! Saving results and closing the script')
 
 raw_parameters_table = raw_parameters_table.drop(['filter_technique', 'filter_order', 'filter_cutoff', 'filter_numNei'], axis=1)
-raw_parameters_table.to_csv('results_table/ORIGINAL_PARAMETERS_TABLE.csv', index=True)
+raw_parameters_table.to_csv('results_table/ORIGINAL_PARAMETERS_ERROR_FIXED.csv', index=True)
 
 # %%
 

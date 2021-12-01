@@ -6,6 +6,9 @@ import numpy as np
 import pandas as pd
 import scipy.signal as ssg
 from astropy.io import fits
+from tqdm import tqdm
+
+from imt_lightcurve.models.lightcurve import LightCurve
 
 
 class DATAHelper():
@@ -99,7 +102,6 @@ class DATAHelper():
 
     @staticmethod
     def resampling_dataset(CSV_PATH: str, RESAMPLE_PATH: str, sample_size):
-
         # Verify if all files have been resampled                
         path, dirs, files = next(os.walk(CSV_PATH))
         num_csv = 0
@@ -159,4 +161,111 @@ class DATAHelper():
     @staticmethod
     def compute_periodogram_feature(CSV_PATH: str) -> pd.DataFrame:
         pass
+
+    @staticmethod
+    def compute_folded_curve(INPUT_CURVES_PATH: str, OUTPUT_FOLDED_CURVES_PATH: str):
+        OUTPUT_FOLDED_CURVES_PATH = OUTPUT_FOLDED_CURVES_PATH.replace("\\", "/")
+        total_files = 0
+        for root_dir_path, sub_dirs, files in os.walk(INPUT_CURVES_PATH):
+            for file in files:
+                if file.endswith('.csv'):
+                    total_files += 1
         
+
+        with tqdm(range(total_files), colour='blue', desc='Simulating') as pbar:
+            for root_dir_path, sub_dirs, files in os.walk(INPUT_CURVES_PATH):
+                for file in files:
+                    if file.endswith('.csv'):
+                        CURVE_PATH = os.path.join(root_dir_path, file)
+                        CURVE_PATH = CURVE_PATH.replace("\\", "/")
+                        CURVE_ID = CURVE_PATH.split('/')[-1].split('_')[-1].split('.')[0]
+                        FILTER_TECHNIQUE = CURVE_PATH.split('/')[8]
+
+                        # print(CURVE_PATH)
+                        # print(FILTER_TECHNIQUE)
+                        # print('\n\n\n')
+                        # break
+                        
+
+                        if FILTER_TECHNIQUE == 'bessel':
+                            n = CURVE_PATH.split('/')[-3]
+                            f = CURVE_PATH.split('/')[-2]
+                            title = f'LC {CURVE_ID}. Bessel {n} and {f}'
+
+                        if FILTER_TECHNIQUE == 'butterworth':
+                            n = CURVE_PATH.split('/')[-3]
+                            f = CURVE_PATH.split('/')[-2]
+                            title = f'LC {CURVE_ID}. Butterworth {n} and {f}'
+
+                        if FILTER_TECHNIQUE == 'gaussian':
+                            f = CURVE_PATH.split('/')[-2]
+                            title = f'LC {CURVE_ID}. Gaussian {f}'
+
+                        if FILTER_TECHNIQUE == 'ideal':
+                            f = CURVE_PATH.split('/')[-2]
+                            title = f'LC {CURVE_ID}. Ideal {f}'
+
+                        if FILTER_TECHNIQUE == 'median':
+                            numNei = CURVE_PATH.split('/')[-2][-1:]
+                            title = f'LC {CURVE_ID}. Median numNei {numNei}'
+
+                        # Reading a curve
+                        data = pd.read_csv(CURVE_PATH)
+                        curve = LightCurve(data.DATE.to_numpy(), data.WHITEFLUX.to_numpy())
+                        # curve.plot(title=title)
+                        # break
+                        
+
+                        # Computing folded curve
+                        folded_curve = curve.fold(CURVE_ID)
+                        # folded_curve.plot(title=f'Folded LC {CURVE_ID}')
+
+                        # Creating a new pd.DataFrame
+                        concat_dict = {
+                        "TIME": pd.Series(folded_curve.time), 
+                        "FOLD_FLUX": pd.Series(folded_curve.flux),
+                        "ERROR": pd.Series(folded_curve.flux_error)
+                        }
+
+                        folded_data = pd.concat(concat_dict, axis=1)
+
+                        # Saving 
+                        SAVING_PATH = OUTPUT_FOLDED_CURVES_PATH + '/' +  '/'.join(CURVE_PATH.split('/')[8:])
+                        folded_data.to_csv(SAVING_PATH, index=False)
+                        pbar.update(1)
+
+    @staticmethod
+    def compute_folded_curve_new(INPUT_CURVES_PATH: str, OUTPUT_FOLDED_CURVES_PATH: str):
+        OUTPUT_FOLDED_CURVES_PATH = OUTPUT_FOLDED_CURVES_PATH.replace("\\", "/")
+        total_files = 0
+        for root_dir_path, sub_dirs, files in os.walk(INPUT_CURVES_PATH):
+            for file in files:
+                if file.endswith('.csv'):
+                    total_files += 1
+
+        with tqdm(range(total_files), colour='blue', desc='Simulating') as pbar:
+            for root_dir_path, sub_dirs, files in os.walk(INPUT_CURVES_PATH):
+                for file in files:
+                    if file.endswith('.csv'):
+                        CURVE_PATH = os.path.join(root_dir_path, file)
+                        CURVE_PATH = CURVE_PATH.replace("\\", "/")
+                        CURVE_ID = CURVE_PATH.split('/')[-1].split('_')[-1].split('.')[0]
+                        data = pd.read_csv(CURVE_PATH)
+                        curve = LightCurve(data.DATE.to_numpy(), data.WHITEFLUX.to_numpy())
+                        folded_curve = curve.fold(CURVE_ID)
+
+                        concat_dict = {
+                            "TIME": pd.Series(folded_curve.time),
+                            "FOLD_FLUX": pd.Series(folded_curve.flux),
+                            "ERROR": pd.Series(folded_curve.flux_error)
+                        }
+
+                        folded_data = pd.concat(concat_dict, axis=1)
+                        SAVING_PATH = OUTPUT_FOLDED_CURVES_PATH + '/' + CURVE_ID + '.csv'
+                        folded_data.to_csv(SAVING_PATH, index=False)
+                        pbar.update(1)
+
+        
+
+
+            

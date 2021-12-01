@@ -6,7 +6,7 @@ from imt_lightcurve.models.lightcurve import LightCurve
 from imt_lightcurve.simulation.simulation import  Simulate
 
 # Chosen a LightCurve to simulation process
-CURVE_ID = '102764809'
+CURVE_ID = '315198039'
 
 # Importing lightcurve data from github
 data = pd.read_csv('https://raw.githubusercontent.com/Guilherme-SSB/IC-CoRoT_Kepler/main/resampled_files/' + CURVE_ID + '.csv')
@@ -39,6 +39,9 @@ adivR_real = LightCurve.get_true_value(curve_id, 'a/R*')
 b_real = LightCurve.get_true_value(curve_id, 'b')
 
 real_parameters = [period_real, adivR_real, p_real, b_real]
+print(real_parameters)
+
+# array([4.0377, 4.0378, 4.0379, 4.038 , 4.0381, 4.0382])
 
 # Defining grid of parameters to search
 period_values = LightCurve.define_interval_period(period_real)
@@ -65,6 +68,7 @@ final_results = SimulationObject.simulate_values(
     filter_cutoff='TESTE',
     filter_numNei='TESTE')
 
+final_results = final_results.drop(['filter_technique', 'filter_order', 'filter_cutoff', 'filter_numNei'], axis=1)
 final_results.head()
 
 # %% Simulating a lightcurve
