@@ -413,6 +413,10 @@ imt_lightcurve/visualization/__pycache__/__init__.cpython-38.pyc
 imt_lightcurve/visualization/__pycache__/__init__.cpython-39.pyc
 imt_lightcurve/visualization/__pycache__/data_viz.cpython-38.pyc
 imt_lightcurve/visualization/__pycache__/data_viz.cpython-39.pyc
+results_table/FINAL_TABLE_ERROR_FIXED.csv
+results_table/FINAL_TABLE_IC.csv
+results_table/ORIGINAL_PARAMETERS_ERROR_FIXED.csv
+results_table/ORIGINAL_PARAMETERS_IC.csv
 results_table/ORIGINAL_PARAMETERS_TABLE.csv
 tests/__init__.py
 tests/test_models-lightcurve.py

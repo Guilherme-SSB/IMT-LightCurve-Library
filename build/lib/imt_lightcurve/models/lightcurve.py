@@ -52,7 +52,7 @@ class BaseLightCurve():
 
 class LightCurve(BaseLightCurve):
 
-    def plot(self, title='Lightcurve', x_axis='Julian Data', y_axis='Flux', label='Lightcurve') -> None:
+    def plot(self, title='Lightcurve', x_axis='Julian Date', y_axis='Flux', label='Lightcurve') -> None:
         line_plot(x_data=self.time, y_data=self.flux, title=title,
                   x_axis=x_axis, y_axis=y_axis, label=label)
 
