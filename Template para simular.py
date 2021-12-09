@@ -6,7 +6,7 @@ from imt_lightcurve.models.lightcurve import LightCurve
 from imt_lightcurve.simulation.simulation import  Simulate
 
 # Chosen a LightCurve to simulation process
-CURVE_ID = '315198039'
+CURVE_ID = '100725706'
 
 # Importing lightcurve data from github
 data = pd.read_csv('https://raw.githubusercontent.com/Guilherme-SSB/IC-CoRoT_Kepler/main/resampled_files/' + CURVE_ID + '.csv')
