@@ -185,14 +185,6 @@ pip-selfcheck.json
 # Support for Project snippet scope
 !.vscode/*.code-snippets
 
-# Others
-__pycache__/
-.eggs/
-.vscode/
-build/
-dist/
-IMT_LightCurve.egg-info/
-
 # End of https://www.toptal.com/developers/gitignore/api/visualstudiocode,virtualenv,python,jupyternotebooks
 
 # Custom rules (everything added below won't be overriden by 'Generate .gitignore File' if you use 'Update' option)
