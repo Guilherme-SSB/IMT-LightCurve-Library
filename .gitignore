@@ -1,5 +1,7 @@
-# Created by https://www.toptal.com/developers/gitignore/api/python,virtualenv,jupyternotebooks,visualstudiocode
-# Edit at https://www.toptal.com/developers/gitignore?templates=python,virtualenv,jupyternotebooks,visualstudiocode
+# File created using '.gitignore Generator' for Visual Studio Code: https://bit.ly/vscode-gig
+
+# Created by https://www.toptal.com/developers/gitignore/api/visualstudiocode,virtualenv,python,jupyternotebooks
+# Edit at https://www.toptal.com/developers/gitignore?templates=visualstudiocode,virtualenv,python,jupyternotebooks
 
 ### JupyterNotebooks ###
 # gitignore template for Jupyter Notebooks
@@ -183,4 +185,15 @@ pip-selfcheck.json
 # Support for Project snippet scope
 !.vscode/*.code-snippets
 
-# End of https://www.toptal.com/developers/gitignore/api/python,virtualenv,jupyternotebooks,visualstudiocode
+# Others
+__pycache__/
+.eggs/
+.vscode/
+build/
+dist/
+IMT_LightCurve.egg-info/
+
+# End of https://www.toptal.com/developers/gitignore/api/visualstudiocode,virtualenv,python,jupyternotebooks
+
+# Custom rules (everything added below won't be overriden by 'Generate .gitignore File' if you use 'Update' option)
+
