@@ -1,5 +1,5 @@
-# Created by https://www.toptal.com/developers/gitignore/api/python,jupyternotebooks
-# Edit at https://www.toptal.com/developers/gitignore?templates=python,jupyternotebooks
+# Created by https://www.toptal.com/developers/gitignore/api/python,virtualenv,jupyternotebooks,visualstudiocode
+# Edit at https://www.toptal.com/developers/gitignore?templates=python,virtualenv,jupyternotebooks,visualstudiocode
 
 ### JupyterNotebooks ###
 # gitignore template for Jupyter Notebooks
@@ -86,8 +86,8 @@ instance/
 # Scrapy stuff:
 .scrapy
 
-; # Sphinx documentation
-; docs/_build/
+# Sphinx documentation
+docs/_build/
 
 # PyBuilder
 .pybuilder/
@@ -152,8 +152,17 @@ dmypy.json
 # Cython debug symbols
 cython_debug/
 
-# Tests 
-tests/*
+### VirtualEnv ###
+# Virtualenv
+# http://iamzed.com/2009/05/07/a-primer-on-virtualenv/
+[Bb]in
+[Ii]nclude
+[Ll]ib
+[Ll]ib64
+[Ll]ocal
+[Ss]cripts
+pyvenv.cfg
+pip-selfcheck.json
 
 ### VisualStudioCode ###
 .vscode/*
@@ -171,4 +180,7 @@ tests/*
 .history
 .ionide
 
-# End of https://www.toptal.com/developers/gitignore/api/python,jupyternotebooks
+# Support for Project snippet scope
+!.vscode/*.code-snippets
+
+# End of https://www.toptal.com/developers/gitignore/api/python,virtualenv,jupyternotebooks,visualstudiocode
