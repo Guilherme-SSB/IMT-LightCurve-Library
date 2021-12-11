@@ -5,7 +5,7 @@ import numpy as np
 from imt_lightcurve.models.lightcurve import LightCurve
 from imt_lightcurve.visualization.data_viz import multi_line_plot
 
-results_final = pd.read_csv('FINAL_TABLE.csv', index_col='CoRoT_ID')
+results_final = pd.read_csv('results_table/FINAL_TABLE_IC.csv', index_col='CoRoT_ID')
 results_final['avg_error'] = (results_final['e_period'] + results_final['e_p'] + results_final['e_adivR'] + results_final['e_b']) / 4
 results_final.head()
 
