@@ -1,13 +1,5 @@
 .gitignore
-OBJETIVOS.TXT
-Phase_Fold_Lightcurve_v1_0.ipynb
 README.md
-Template - Analise dos resultados.py
-Template - Aplica fold para todos as curvas filtradas.py
-Template - Estudo Final v1.0.py
-Template - Obter parâmetros das curvas sem filtragem.py
-Template - Simular para todas curvas filtradas.py
-Template para simular.py
 setup.py
 .eggs/README.txt
 .eggs/atomicwrites-1.4.0-py3.8.egg/EGG-INFO/LICENSE
