@@ -19,7 +19,7 @@ COMPLETE_TABLE_V_DELEUIL_PATH = 'files/asu.tsv'
 complete_table_5 = pd.read_csv(COMPLETE_TABLE_V_DELEUIL_PATH, delimiter=';')
 
 
-class BaseLightCurve():
+class BaseLightCurve:
     # Attributes
     time: np.ndarray
     flux: np.ndarray
